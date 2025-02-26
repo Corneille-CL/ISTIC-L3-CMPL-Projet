@@ -6,6 +6,8 @@
 
 // attention l'analyse est poursuivie apres erreur si l'on supprime la clause rulecatch
 
+// {PtGen.pt(0);}
+
 grammar projet;
 
 options {
@@ -64,14 +66,14 @@ specif  : ident  ( 'fixe' '(' type  ( ',' type  )* ')' )?
                  ( 'mod'  '(' type  ( ',' type  )* ')' )? 
   ;
   
-consts  : 'const' ( ident  '=' valeur  ptvg  )+ 
+consts  : 'const' ( ident '=' valeur {PtGen.pt(103);} ptvg  ) +
   ;
   
-vars  : 'var' ( type ident  ( ','  ident  )* ptvg  )+
+vars  : 'var' ( type ident {PtGen.pt(104);}  ( ','  ident {PtGen.pt(104);} )* ptvg  )+ {PtGen.pt(105);}
   ;
   
-type  : 'ent'  
-  |     'bool' 
+type  : 'ent' {PtGen.pt(101);}  
+  |     'bool' {PtGen.pt(102);}
   ;
   
 decprocs: (decproc ptvg)+
@@ -143,48 +145,48 @@ effixes : '(' (expression  (',' expression  )*)? ')'
 effmods :'(' (ident  (',' ident  )*)? ')'
   ; 
   
-expression: (exp1) ('ou'  exp1  )*
+expression: (exp1) ('ou'  exp1 {PtGen.pt(203);} )* 
   ;
   
-exp1  : exp2 ('et'  exp2  )*
+exp1  : exp2 ('et'  exp2 {PtGen.pt(204);} )*
   ;
   
-exp2  : 'non' exp2 
-  | exp3  
+exp2  : 'non' exp2 {PtGen.pt(205);} 
+  | exp3
   ;
   
 exp3  : exp4 
-  ( '='   exp4 
-  | '<>'  exp4 
-  | '>'   exp4 
-  | '>='  exp4 
-  | '<'   exp4 
-  | '<='  exp4  
+  ( '='   exp4 {PtGen.pt(206);} 
+  | '<>'  exp4 {PtGen.pt(207);} 
+  | '>'   exp4 {PtGen.pt(208);} 
+  | '>='  exp4 {PtGen.pt(209);} 
+  | '<'   exp4 {PtGen.pt(210);} 
+  | '<='  exp4  {PtGen.pt(211);} 
   ) ?
   ;
   
 exp4  : exp5 
-        ('+'  exp5 
-        |'-'  exp5 
+        ('+'  exp5 {PtGen.pt(212);} 
+        |'-'  exp5 {PtGen.pt(213);} 
         )*
   ;
   
 exp5  : primaire 
-        (    '*'   primaire 
-          | 'div'  primaire 
+        (    '*'   primaire {PtGen.pt(214);} 
+          | 'div'  primaire {PtGen.pt(215);} 
         )*
   ;
   
-primaire: valeur 
-  | ident  
+primaire: valeur {PtGen.pt(201);} 
+  | ident  {PtGen.pt(202);} 
   | '(' expression ')'
   ;
   
-valeur  : nbentier 
-  | '+' nbentier 
-  | '-' nbentier 
-  | 'vrai' 
-  | 'faux' 
+valeur  : nbentier {PtGen.pt(001);} 
+  | '+' nbentier {PtGen.pt(001);} 
+  | '-' nbentier {PtGen.pt(002);} 
+  | 'vrai' {PtGen.pt(003);} 
+  | 'faux' {PtGen.pt(004);} 
   ;
 
 // partie lexicale  : cette partie ne doit pas etre modifiee  //

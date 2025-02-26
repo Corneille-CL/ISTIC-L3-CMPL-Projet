@@ -1,0 +1,49 @@
+dans tabSymb :
+ - indice
+ - var ou const
+ - le type
+
+0XX : valeur
+1XX : déclarations
+2XX : calcul d'expressions
+
+001 : ent pos
+002 : ent neg
+003 : bool vrai
+004 : bool faux
+
+101 : tCour = ent
+102 : tCour = bool
+103 : ajouter une const a tabSymb de type tCour et de valeur valEnt avec un if en fonction du type
+104 : ajouter une var à tabSymb de type tCour et de valeur valEnt avec un if en fonction du type
+
+201 : empile la valeur en dure
+202 : empile la valeur de l'ident (varglo ou const)
+203 : pile OU
+204 : pile ET
+205 : pile NON
+206 : pile Eg
+207 : pile DIFF
+208 : pile SUP
+209 : pile SUPEG
+210 : pile INF
+211 : pile INFEG
+212 : pile ADD
+213 : pile SOUS
+214 : pile MUL
+215 : pile DIV
+FAIRE LES TESTS DE TYPE AVEC TCOUR + VOIR TD ASKIP
+
+{PtGen.pt(001);} 
+TestsProjet/DeclExp-
+
+
+
+
+déclarations des ident :
+
+	déclaration des variables:
+	
+
+	déclaration des constantes:
+

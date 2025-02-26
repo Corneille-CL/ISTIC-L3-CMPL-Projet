@@ -117,7 +117,7 @@ public class PtGen {
     // -------------------------
     
  // MERCI de renseigner ici un nom pour le trinome, constitue EXCLUSIVEMENT DE LETTRES
-    public static String trinome="XxxYyyZzz"; 	//TODO 
+    public static String trinome="LeffondreElAroussiHanine"; 	//TODO 
     
     private static int tCour; // type de l'expression compilee
     private static int vCour; // sert uniquement lors de la compilation d'une valeur (entiere ou boolenne)
@@ -131,7 +131,10 @@ public class PtGen {
     // it = indice de remplissage de tabSymb
     // bc = bloc courant (=1 si le bloc courant est le programme principal)
 	private static int it, bc;
-	
+	//VARIABLES PAR NOUS
+	private static int valAct; // valeur actuelle de l'item pour les declarations et expressions
+	private static int indVarGlob;
+	//TODO : initialiser les belles variables
 	/** 
 	 * utilitaire de recherche de l'ident courant (ayant pour code UtilLex.numIdCourant) dans tabSymb
 	 * 
@@ -210,6 +213,8 @@ public class PtGen {
 		// initialisation du type de l'expression courante
 		tCour = NEUTRE;
 
+		indVarGlob = 0;
+
 		//TODO si necessaire
 
 	} // initialisations
@@ -225,9 +230,93 @@ public class PtGen {
 		case 0:
 			initialisations();
 			break;
+
+		case 001:
+			valAct = UtilLex.valEnt;
+			tCour = ENT;
+			break;
+		case 002:
+			valAct = -UtilLex.valEnt;
+			tCour = ENT;
+			break;
+		case 003:
+			valAct = 1;
+			tCour = BOOL;
+			break;
+		case 004:
+			valAct = 0;
+			tCour = BOOL;
+			break;
 		
-		// TODO
+		case 101 :
+			tCour = ENT;
+			break;
+		case 102 :
+			tCour = BOOL;
+			break;
+		case 103 :
+			placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, valAct);
+			break;
+		case 104 :
+			placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, indVarGlob);
+			indVarGlob += 1;
+			break;
+		case 105 :
+			po.produire(RESERVER);
+			po.produire(indVarGlob);
+			break;
+		
+		case 201:
+			po.produire(EMPILER);
+			po.produire(valAct);
+			break;
+		case 202:
+			po.produire(EMPILER);
 			
+			po.produire(tabSymb[UtilLex.numIdCourant].info);
+			break;
+		case 203:
+			po.produire(OU);
+			break;
+		case 204:
+			po.produire(ET);
+			break;
+		case 205:
+			po.produire(NON);
+			break;
+		case 206:
+			po.produire(EG);
+			
+			break;
+		case 207:
+			po.produire(DIFF);
+			break;
+		case 208:
+			po.produire(SUP);
+			break;
+		case 209:
+			po.produire(SUPEG);
+			break;
+		case 210:
+			po.produire(INF);
+			break;
+		case 211:
+			po.produire(INFEG);
+			break;
+		case 212:
+			po.produire(ADD);
+			break;
+		case 213:
+			po.produire(SOUS);
+			break;
+		case 214:
+			po.produire(MUL);
+			break;
+		case 215:
+			po.produire(DIV);
+			break;
+
+		
 		case 255 : 
 			afftabSymb(); // affichage de la table des symboles en fin de compilation
 			break;
