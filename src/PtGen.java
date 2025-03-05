@@ -134,6 +134,8 @@ public class PtGen {
 	//VARIABLES PAR NOUS
 	private static int valAct; // valeur actuelle de l'item pour les declarations et expressions
 	private static int indVarGlob;
+	private static int indIdentAff;
+	private static int nbConst;
 	//TODO : initialiser les belles variables
 	/** 
 	 * utilitaire de recherche de l'ident courant (ayant pour code UtilLex.numIdCourant) dans tabSymb
@@ -214,6 +216,8 @@ public class PtGen {
 		tCour = NEUTRE;
 
 		indVarGlob = 0;
+		nbConst = 0;
+		indIdentAff = 0;
 
 		//TODO si necessaire
 
@@ -222,10 +226,9 @@ public class PtGen {
 	/**
 	 *  code des points de generation A COMPLETER
 	 *  -----------------------------------------
-	 * @param numGen : numero du point de generation a executer
+	 * @param numGen : numero du001 point de generation a executer
 	 */
 	public static void pt(int numGen) {
-	
 		switch (numGen) {
 		case 0:
 			initialisations();
@@ -256,6 +259,7 @@ public class PtGen {
 			break;
 		case 103 :
 			placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, valAct);
+			nbConst ++;
 			break;
 		case 104 :
 			placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, indVarGlob);
@@ -265,15 +269,33 @@ public class PtGen {
 			po.produire(RESERVER);
 			po.produire(indVarGlob);
 			break;
+		case 106 :
+			indIdentAff = UtilLex.numIdCourant;
+			if(tabSymb[indIdentAff].categorie == CONSTANTE){
+				UtilLex.messErr("une constante ne peut être modifiée");
+			}
+			break;
+		case 107 :
+			if(tabSymb[indIdentAff].type != tCour){
+				//UtilLex.messErr("les types ne correspondent pas");
+			}
+			po.produire(AFFECTERG);
+			po.produire(indIdentAff - nbConst - 1);
+			break;
 		
 		case 201:
 			po.produire(EMPILER);
 			po.produire(valAct);
 			break;
 		case 202:
-			po.produire(EMPILER);
-			
-			po.produire(tabSymb[UtilLex.numIdCourant].info);
+			if(tabSymb[UtilLex.numIdCourant].categorie == CONSTANTE){
+				po.produire(EMPILER);
+				po.produire(tabSymb[UtilLex.numIdCourant].info);
+			} else {
+				po.produire(CONTENUG);
+				po.produire(tabSymb[UtilLex.numIdCourant].info);
+			}
+			tCour = tabSymb[UtilLex.numIdCourant].type;
 			break;
 		case 203:
 			po.produire(OU);
@@ -315,10 +337,27 @@ public class PtGen {
 		case 215:
 			po.produire(DIV);
 			break;
-
-		
+		case 216:
+			tCour = ENT;
+			break;
+		case 217:
+			tCour = BOOL;
+			break;
+		case 218:
+			verifEnt();
+			break;
+		case 219:
+			verifBool();
+			break;
+		case 220:
+			if(tabSymb[indIdentAff].type == ENT){
+				verifEnt();
+			} else {
+				verifBool();
+			}
 		case 255 : 
 			afftabSymb(); // affichage de la table des symboles en fin de compilation
+			po.constGen();
 			break;
 
 		

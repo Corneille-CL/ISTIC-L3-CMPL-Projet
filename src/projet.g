@@ -134,7 +134,7 @@ ecriture: 'ecrire' '(' expression  ( ',' expression  )* ')'
    ;
   
 affouappel
-  : ident  (    ':=' expression 
+  : ident {PtGen.pt(106);} (    ':=' expression {PtGen.pt(107);} {PtGen.pt(220);}
             |   (effixes (effmods)?)?  
            )
   ;
@@ -145,48 +145,48 @@ effixes : '(' (expression  (',' expression  )*)? ')'
 effmods :'(' (ident  (',' ident  )*)? ')'
   ; 
   
-expression: (exp1) ('ou'  exp1 {PtGen.pt(203);} )* 
+expression: (exp1) {PtGen.pt(219);} ('ou' exp1 {PtGen.pt(219);} {PtGen.pt(203);} )* 
   ;
   
-exp1  : exp2 ('et'  exp2 {PtGen.pt(204);} )*
+exp1  : exp2 {PtGen.pt(219);} ('et' exp2 {PtGen.pt(219);} {PtGen.pt(204);} )*
   ;
   
-exp2  : 'non' exp2 {PtGen.pt(205);} 
+exp2  : 'non' exp2 {PtGen.pt(219);}  {PtGen.pt(205);} 
   | exp3
   ;
   
 exp3  : exp4 
-  ( '='   exp4 {PtGen.pt(206);} 
-  | '<>'  exp4 {PtGen.pt(207);} 
-  | '>'   exp4 {PtGen.pt(208);} 
-  | '>='  exp4 {PtGen.pt(209);} 
-  | '<'   exp4 {PtGen.pt(210);} 
-  | '<='  exp4  {PtGen.pt(211);} 
+  ( {PtGen.pt(218);} '='  exp4 {PtGen.pt(218);} {PtGen.pt(217);}  {PtGen.pt(206);} 
+  | {PtGen.pt(218);} '<>'  exp4 {PtGen.pt(218);} {PtGen.pt(217);} {PtGen.pt(207);} 
+  | {PtGen.pt(218);} '>'   exp4 {PtGen.pt(218);} {PtGen.pt(217);} {PtGen.pt(208);} 
+  | {PtGen.pt(218);} '>='  exp4 {PtGen.pt(218);} {PtGen.pt(217);} {PtGen.pt(209);} 
+  | {PtGen.pt(218);} '<'   exp4 {PtGen.pt(218);} {PtGen.pt(217);} {PtGen.pt(210);} 
+  | {PtGen.pt(218);} '<='  exp4 {PtGen.pt(218);} {PtGen.pt(217);} {PtGen.pt(211);} 
   ) ?
   ;
   
 exp4  : exp5 
-        ('+'  exp5 {PtGen.pt(212);} 
-        |'-'  exp5 {PtGen.pt(213);} 
+        ( {PtGen.pt(218);} '+' exp5 {PtGen.pt(218);}  {PtGen.pt(212);} 
+        | {PtGen.pt(218);} '-'  exp5 {PtGen.pt(218);}  {PtGen.pt(213);} 
         )*
   ;
   
 exp5  : primaire 
-        (    '*'   primaire {PtGen.pt(214);} 
-          | 'div'  primaire {PtGen.pt(215);} 
+        (  {PtGen.pt(218);}  '*'   primaire  {PtGen.pt(218);} {PtGen.pt(214);} 
+          | {PtGen.pt(218);} 'div' primaire  {PtGen.pt(218);} {PtGen.pt(215);} 
         )*
   ;
   
 primaire: valeur {PtGen.pt(201);} 
-  | ident  {PtGen.pt(202);} 
+  |  ident {PtGen.pt(202);} 
   | '(' expression ')'
   ;
   
-valeur  : nbentier {PtGen.pt(001);} 
-  | '+' nbentier {PtGen.pt(001);} 
-  | '-' nbentier {PtGen.pt(002);} 
-  | 'vrai' {PtGen.pt(003);} 
-  | 'faux' {PtGen.pt(004);} 
+valeur  :  nbentier {PtGen.pt(001);} 
+  | {PtGen.pt(216);}'+' nbentier {PtGen.pt(001);} 
+  | {PtGen.pt(216);} '-' nbentier {PtGen.pt(002);} 
+  | {PtGen.pt(217);} 'vrai' {PtGen.pt(003);} 
+  | {PtGen.pt(217);} 'faux' {PtGen.pt(004);} 
   ;
 
 // partie lexicale  : cette partie ne doit pas etre modifiee  //
