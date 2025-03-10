@@ -6,6 +6,7 @@ dans tabSymb :
 0XX : valeur
 1XX : déclarations / affections
 2XX : calcul d'expressions
+3XX : instructions entrée et sortie
 
 001 : ent pos
 002 : ent neg
@@ -41,17 +42,21 @@ dans tabSymb :
 219 : verification du type bool
 220 : verif tCour = type de l'ident affecté
 
+301 : produire lirent ou lirebool en fonction du type
+302 : produire ecrent ou ecrbool en fonction du type
+
 FAIRE LES TESTS DE TYPE AVEC TCOUR + VOIR TD ASKIP
 
 {PtGen.pt(001);} 
 TestsProjet/DeclExp-
 
+TODO:
+	faire les erreurs de ident
 
+	lire ecrire :
+	PtGen des 301 et 302 avec test type et produire
 
-déclarations des ident :
+	if et cond ... :
+	faire tout
 
-	déclaration des variables:
-	
-
-	déclaration des constantes:
 
