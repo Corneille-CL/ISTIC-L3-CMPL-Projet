@@ -355,6 +355,7 @@ public class PtGen {
 			} else {
 				verifBool();
 			}
+			break;
 		case 255 : 
 			afftabSymb(); // affichage de la table des symboles en fin de compilation
 			po.constGen();
