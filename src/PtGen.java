@@ -396,7 +396,6 @@ public class PtGen {
 				po.produire(ECRBOOL);
 			}
 			break;
-
 		case 401:
 			po.produire(BSIFAUX);
 			po.produire(-1);
@@ -435,6 +434,19 @@ public class PtGen {
 				po.modifier(nextIpo, po.getIpo()+1);
 				nextIpo = tmpIpo;
 			}
+			break;
+		case 408:
+			pileRep.empiler(po.getIpo()+1);
+			break;
+		case 409:
+			po.produire(BSIFAUX);
+			po.produire(-1);
+			pileRep.empiler(po.getIpo());
+			break;
+		case 410:
+			po.produire(BINCOND);
+			po.modifier(pileRep.depiler(), po.getIpo()+2);
+			po.produire(pileRep.depiler());
 			break;
 		case 999 : 
 			afftabSymb(); // affichage de la table des symboles en fin de compilation
