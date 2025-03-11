@@ -28,6 +28,7 @@ import java.io.*;
  * (verifications semantiques + production du code objet)
  * 
  * @author Girard, Masson, Perraudeau
+ * @author El Aroussi, Hanine, Leffondré
  *
  */
 
@@ -108,7 +109,7 @@ public class PtGen {
 			po.vecteurTrans(valeur);
 			desc.incrNbTansExt();
 		}
-	}    
+	}
     // descripteur associe a un programme objet (compilation separee)
     private static Descripteur desc;
 
@@ -117,11 +118,10 @@ public class PtGen {
     // -------------------------
     
  // MERCI de renseigner ici un nom pour le trinome, constitue EXCLUSIVEMENT DE LETTRES
-    public static String trinome="LeffondreElAroussiHanine"; 	//TODO 
+    public static String trinome="LeffondreElAroussiHanine";
     
     private static int tCour; // type de l'expression compilee
     private static int vCour; // sert uniquement lors de la compilation d'une valeur (entiere ou boolenne)
-  
    
     // TABLE DES SYMBOLES
     // ------------------
@@ -229,6 +229,7 @@ public class PtGen {
 	 * @param numGen : numero du001 point de generation a executer
 	 */
 	public static void pt(int numGen) {
+		int ind;
 		switch (numGen) {
 		case 0:
 			initialisations();
@@ -356,8 +357,38 @@ public class PtGen {
 				verifBool();
 			}
 			break;
-		case 255 : 
+		case 301:
+			ind = presentIdent(1);
+			if(ind == 0){
+				UtilLex.messErr("variable non déclarée");
+			}
+			if(ind < indVarGlob){
+				UtilLex.messErr("une constante ne peut être modifiée");
+			}
+
+			if(tabSymb[ind].type == BOOL){
+				po.produire(LIREBOOL);
+			} else {
+				po.produire(LIRENT);
+			}
+			
+			po.produire(AFFECTERG); //TODO pb avec les procs
+			po.produire(ind);
+			break;
+		case 302:
+			ind = presentIdent(1);
+			if(ind == 0){
+				UtilLex.messErr("variable non déclarée");
+			}
+			if(tabSymb[ind].type == ENT){
+				po.produire(ECRENT);
+			} else {
+				po.produire(ECRBOOL);
+			}
+			break;
+		case 999 : 
 			afftabSymb(); // affichage de la table des symboles en fin de compilation
+			po.produire(ARRET);
 			po.constGen();
 			break;
 

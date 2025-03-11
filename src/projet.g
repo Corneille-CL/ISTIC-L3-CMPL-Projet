@@ -36,7 +36,7 @@ import java.io.FileInputStream;
 catch (RecognitionException e) {reportError (e) ; throw e ; }}
 
 
-unite  :   unitprog {PtGen.pt(255);} EOF
+unite  :   unitprog {PtGen.pt(999);} EOF
       |    unitmodule  EOF
   ;
   

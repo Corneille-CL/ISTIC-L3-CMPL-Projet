@@ -45,6 +45,8 @@ dans tabSymb :
 301 : produire lirent ou lirebool en fonction du type
 302 : produire ecrent ou ecrbool en fonction du type
 
+1000: exit
+
 FAIRE LES TESTS DE TYPE AVEC TCOUR + VOIR TD ASKIP
 
 {PtGen.pt(001);} 
