@@ -372,7 +372,7 @@ public class PtGen {
 			if(ind == 0){
 				UtilLex.messErr("variable non déclarée");
 			}
-			if(ind < indVarGlob){
+			if(ind <= nbConst){
 				UtilLex.messErr("une constante ne peut être modifiée");
 			}
 
@@ -383,7 +383,7 @@ public class PtGen {
 			}
 			
 			po.produire(AFFECTERG); //TODO pb avec les procs
-			po.produire(ind);
+			po.produire(ind-nbConst-1);
 			break;
 		case 302:
 			ind = presentIdent(1);
@@ -394,6 +394,46 @@ public class PtGen {
 				po.produire(ECRENT);
 			} else {
 				po.produire(ECRBOOL);
+			}
+			break;
+
+		case 401:
+			po.produire(BSIFAUX);
+			po.produire(-1);
+			pileRep.empiler(po.getIpo());
+			break;
+		case 402:
+			po.produire(BINCOND);
+			po.produire(-1);
+			po.modifier(pileRep.depiler(), po.getIpo()+1);
+			pileRep.empiler(po.getIpo());
+			break;
+		case 403:
+			po.modifier(pileRep.depiler(), po.getIpo()+1);
+			break;
+		case 404:
+			po.produire(BSIFAUX);
+			po.produire(-1);
+			pileRep.empiler(po.getIpo());
+			break;
+		case 405:
+			po.produire(BINCOND);
+			po.produire(-1);
+			po.modifier(pileRep.depiler(), po.getIpo()+1);
+			pileRep.empiler(po.getIpo());
+			break;
+		case 406:
+			po.produire(BINCOND);
+			po.modifier(pileRep.depiler(), po.getIpo()+2);
+			po.produire(pileRep.depiler());
+			pileRep.empiler(po.getIpo());
+			break;
+		case 407:
+			int nextIpo = pileRep.depiler();
+			while (nextIpo != -1){
+				int tmpIpo = po.getElt(nextIpo);
+				po.modifier(nextIpo, po.getIpo()+1);
+				nextIpo = tmpIpo;
 			}
 			break;
 		case 999 : 
