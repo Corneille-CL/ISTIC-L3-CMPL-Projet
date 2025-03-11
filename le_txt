@@ -45,6 +45,22 @@ dans tabSymb :
 301 : produire lirent ou lirebool en fonction du type
 302 : produire ecrent ou ecrbool en fonction du type
 
+401 : instruction bsifaux
+402 : instruction bincond
+
+
+
+
+
+
+410:
+411:
+412:
+
+
+
+
+
 1000: exit
 
 FAIRE LES TESTS DE TYPE AVEC TCOUR + VOIR TD ASKIP

@@ -372,7 +372,7 @@ public class PtGen {
 			if(ind == 0){
 				UtilLex.messErr("variable non déclarée");
 			}
-			if(ind < indVarGlob){
+			if(ind <= nbConst){
 				UtilLex.messErr("une constante ne peut être modifiée");
 			}
 
@@ -396,6 +396,34 @@ public class PtGen {
 				po.produire(ECRBOOL);
 			}
 			break;
+		case 401: 
+			po.produire(BSIFAUX);
+			po.produire(-1);
+			pileRep.empiler(po.getIpo());
+			break;
+		case 402: 
+			po.produire(BINCOND);
+			po.produire(-1);
+			po.modifier(pileRep.depiler(), po.getIpo()+1);
+			pileRep.empiler(po.getIpo());
+			break;
+		case 403:
+			po.modifier(pileRep.depiler(), po.getIpo()+1);
+			break;
+		case 408:
+			pileRep.empiler(po.getIpo()+1);
+			break;
+		case 409:
+			po.produire(BSIFAUX);
+			po.produire(-1);
+			pileRep.empiler(po.getIpo());
+			break;
+		case 410:
+			po.produire(BINCOND);
+			po.modifier(pileRep.depiler(), po.getIpo()+2);
+			po.produire(pileRep.depiler());
+			break;
+
 		case 999 : 
 			afftabSymb(); // affichage de la table des symboles en fin de compilation
 			po.produire(ARRET);

@@ -115,7 +115,7 @@ instruction
   |
   ;
   
-inssi : 'si' expression 'alors' instructions ('sinon'  instructions)? 'fsi' 
+inssi : 'si' expression {PtGen.pt(219);} {PtGen.pt(401);} 'alors' instructions ('sinon' {PtGen.pt(402);} instructions)? 'fsi' {PtGen.pt(403);}
   ;
   
 inscond : 'cond'  expression  ':' instructions 
@@ -124,7 +124,7 @@ inscond : 'cond'  expression  ':' instructions
           'fcond' 
   ;
   
-boucle  : 'ttq'  expression 'faire' instructions 'fait' 
+boucle  : 'ttq' {PtGen.pt(408);} expression {PtGen.pt(409);} 'faire' instructions {PtGen.pt(410);} 'fait'
   ;
   
 lecture: 'lire' '(' ident {PtGen.pt(301);} ( ',' ident {PtGen.pt(301);} )* ')' 
@@ -156,7 +156,7 @@ exp2  : 'non' exp2 {PtGen.pt(219);}  {PtGen.pt(205);}
   ;
   
 exp3  : exp4 
-  (  '=' {PtGen.pt(218);} exp4 {PtGen.pt(218);} {PtGen.pt(217);}  {PtGen.pt(206);} 
+  ( '=' {PtGen.pt(218);} exp4 {PtGen.pt(218);} {PtGen.pt(217);}  {PtGen.pt(206);} 
   | '<>' {PtGen.pt(218);} exp4 {PtGen.pt(218);} {PtGen.pt(217);} {PtGen.pt(207);} 
   | '>'  {PtGen.pt(218);} exp4 {PtGen.pt(218);} {PtGen.pt(217);} {PtGen.pt(208);} 
   | '>=' {PtGen.pt(218);} exp4 {PtGen.pt(218);} {PtGen.pt(217);} {PtGen.pt(209);} 
