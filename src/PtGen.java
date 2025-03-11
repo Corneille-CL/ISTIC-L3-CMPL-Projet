@@ -259,12 +259,22 @@ public class PtGen {
 			tCour = BOOL;
 			break;
 		case 103 :
-			placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, valAct);
-			nbConst ++;
+			ind = presentIdent(1);
+			if(ind != 0){
+				UtilLex.messErr("ident déjà déclaré");
+			}else{
+				placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, valAct);
+				nbConst ++;
+			}
 			break;
 		case 104 :
-			placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, indVarGlob);
-			indVarGlob += 1;
+			ind = presentIdent(1);
+			if(ind != 0){
+				UtilLex.messErr("ident déjà déclaré");
+			}else{
+				placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, indVarGlob);
+				indVarGlob += 1;
+			}
 			break;
 		case 105 :
 			po.produire(RESERVER);
