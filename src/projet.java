@@ -54,7 +54,7 @@ class projet {
 	public static void main(String [] args) {
 		System.out.println("PROJET DE COMPILATION version : " + PtGen.trinome);
 		System.out.println("----------------------------------------");
-		System.out.println();
+		System.out.println();{PtGen.pt(219);}
 		
 		do 
 		 {

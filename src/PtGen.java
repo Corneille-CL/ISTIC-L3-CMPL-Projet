@@ -229,7 +229,7 @@ public class PtGen {
 	 * @param numGen : numero du001 point de generation a executer
 	 */
 	public static void pt(int numGen) {
-		int ind;
+		int ind = presentIdent(1);
 		switch (numGen) {
 		case 0:
 			initialisations();
@@ -259,7 +259,6 @@ public class PtGen {
 			tCour = BOOL;
 			break;
 		case 103 :
-			ind = presentIdent(1);
 			if(ind != 0){
 				UtilLex.messErr("ident déjà déclaré");
 			}else{
@@ -268,7 +267,6 @@ public class PtGen {
 			}
 			break;
 		case 104 :
-			ind = presentIdent(1);
 			if(ind != 0){
 				UtilLex.messErr("ident déjà déclaré");
 			}else{
@@ -281,6 +279,9 @@ public class PtGen {
 			po.produire(indVarGlob);
 			break;
 		case 106 :
+			if(ind == 0){
+				UtilLex.messErr("ident non déclaré");
+			}
 			indIdentAff = UtilLex.numIdCourant;
 			if(tabSymb[indIdentAff].categorie == CONSTANTE){
 				UtilLex.messErr("une constante ne peut être modifiée");
@@ -368,7 +369,6 @@ public class PtGen {
 			}
 			break;
 		case 301:
-			ind = presentIdent(1);
 			if(ind == 0){
 				UtilLex.messErr("variable non déclarée");
 			}
@@ -386,7 +386,6 @@ public class PtGen {
 			po.produire(ind-nbConst-1);
 			break;
 		case 302:
-			ind = presentIdent(1);
 			if(ind == 0){
 				UtilLex.messErr("variable non déclarée");
 			}
