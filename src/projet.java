@@ -12,10 +12,12 @@
  *****************************************************************************************************/
 
 
-import java.io.*;
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * classe permettant d'enchainer la compilation de plusieurs programmes en langage PROJET
@@ -54,7 +56,7 @@ class projet {
 	public static void main(String [] args) {
 		System.out.println("PROJET DE COMPILATION version : " + PtGen.trinome);
 		System.out.println("----------------------------------------");
-		System.out.println();{PtGen.pt(219);}
+		System.out.println();
 		
 		do 
 		 {

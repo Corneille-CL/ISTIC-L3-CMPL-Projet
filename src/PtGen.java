@@ -229,12 +229,10 @@ public class PtGen {
 	 * @param numGen : numero du001 point de generation a executer
 	 */
 	public static void pt(int numGen) {
-		int ind = presentIdent(1);
 		switch (numGen) {
 		case 0:
 			initialisations();
 			break;
-
 		case 001:
 			valAct = UtilLex.valEnt;
 			tCour = ENT;
@@ -259,7 +257,7 @@ public class PtGen {
 			tCour = BOOL;
 			break;
 		case 103 :
-			if(ind != 0){
+			if(presentIdent(1) != 0){
 				UtilLex.messErr("ident déjà déclaré");
 			}else{
 				placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, valAct);
@@ -267,7 +265,7 @@ public class PtGen {
 			}
 			break;
 		case 104 :
-			if(ind != 0){
+			if(presentIdent(1) != 0){
 				UtilLex.messErr("ident déjà déclaré");
 			}else{
 				placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, indVarGlob);
@@ -279,10 +277,10 @@ public class PtGen {
 			po.produire(indVarGlob);
 			break;
 		case 106 :
-			if(ind == 0){
+			if(presentIdent(1) == 0){
 				UtilLex.messErr("ident non déclaré");
 			}
-			indIdentAff = UtilLex.numIdCourant;
+			indIdentAff = presentIdent(1);
 			if(tabSymb[indIdentAff].categorie == CONSTANTE){
 				UtilLex.messErr("une constante ne peut être modifiée");
 			}
@@ -292,7 +290,7 @@ public class PtGen {
 				//UtilLex.messErr("les types ne correspondent pas");
 			}
 			po.produire(AFFECTERG);
-			po.produire(indIdentAff - nbConst - 1);
+			po.produire(indIdentAff);
 			break;
 		
 		case 201:
@@ -300,14 +298,14 @@ public class PtGen {
 			po.produire(valAct);
 			break;
 		case 202:
-			if(tabSymb[UtilLex.numIdCourant].categorie == CONSTANTE){
+			if(tabSymb[presentIdent(1)].categorie == CONSTANTE){
 				po.produire(EMPILER);
-				po.produire(tabSymb[UtilLex.numIdCourant].info);
+				po.produire(tabSymb[presentIdent(1)].info);
 			} else {
 				po.produire(CONTENUG);
-				po.produire(tabSymb[UtilLex.numIdCourant].info);
+				po.produire(tabSymb[presentIdent(1)].info);
 			}
-			tCour = tabSymb[UtilLex.numIdCourant].type;
+			tCour = tabSymb[presentIdent(1)].type;
 			break;
 		case 203:
 			po.produire(OU);
@@ -369,64 +367,48 @@ public class PtGen {
 			}
 			break;
 		case 301:
-			if(ind == 0){
+			if(presentIdent(1) == 0){
 				UtilLex.messErr("variable non déclarée");
 			}
-			if(ind <= nbConst){
+			if(presentIdent(1) <= nbConst){
 				UtilLex.messErr("une constante ne peut être modifiée");
 			}
 
-			if(tabSymb[ind].type == BOOL){
+			if(tabSymb[presentIdent(1)].type == BOOL){
 				po.produire(LIREBOOL);
 			} else {
 				po.produire(LIRENT);
 			}
 			
 			po.produire(AFFECTERG); //TODO pb avec les procs
-			po.produire(ind-nbConst-1);
+			po.produire(presentIdent(1)-nbConst-1);
 			break;
 		case 302:
-			if(ind == 0){
+			if(presentIdent(1) == 0){
 				UtilLex.messErr("variable non déclarée");
 			}
-			if(tabSymb[ind].type == ENT){
+			if(tabSymb[presentIdent(1) ].type == ENT){
 				po.produire(ECRENT);
 			} else {
 				po.produire(ECRBOOL);
 			}
 			break;
+
 		case 401:
-			po.produire(BSIFAUX);
-			po.produire(-1);
-			pileRep.empiler(po.getIpo());
+			pileRep.empiler(-1);
 			break;
 		case 402:
-			po.produire(BINCOND);
+			po.produire(BSIFAUX);
 			po.produire(-1);
-			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			pileRep.empiler(po.getIpo());
 			break;
 		case 403:
-			po.modifier(pileRep.depiler(), po.getIpo()+1);
-			break;
-		case 404:
-			po.produire(BSIFAUX);
-			po.produire(-1);
-			pileRep.empiler(po.getIpo());
-			break;
-		case 405:
-			po.produire(BINCOND);
-			po.produire(-1);
-			po.modifier(pileRep.depiler(), po.getIpo()+1);
-			pileRep.empiler(po.getIpo());
-			break;
-		case 406:
 			po.produire(BINCOND);
 			po.modifier(pileRep.depiler(), po.getIpo()+2);
 			po.produire(pileRep.depiler());
 			pileRep.empiler(po.getIpo());
 			break;
-		case 407:
+		case 404:
 			int nextIpo = pileRep.depiler();
 			while (nextIpo != -1){
 				int tmpIpo = po.getElt(nextIpo);
@@ -437,11 +419,7 @@ public class PtGen {
 		case 408:
 			pileRep.empiler(po.getIpo()+1);
 			break;
-		case 409:
-			po.produire(BSIFAUX);
-			po.produire(-1);
-			pileRep.empiler(po.getIpo());
-			break;
+		
 		case 410:
 			po.produire(BINCOND);
 			po.modifier(pileRep.depiler(), po.getIpo()+2);
@@ -461,17 +439,3 @@ public class PtGen {
 		}
 	}
 }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
- 
