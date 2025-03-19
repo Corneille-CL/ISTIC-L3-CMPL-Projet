@@ -447,6 +447,11 @@ public class PtGen {
 			po.modifier(pileRep.depiler(), po.getIpo()+2);
 			po.produire(pileRep.depiler());
 			break;
+		case 501:
+			tCour=NEUTRE;
+			break;
+		case 502:
+			break;
 		case 999 : 
 			afftabSymb(); // affichage de la table des symboles en fin de compilation
 			po.produire(ARRET);
