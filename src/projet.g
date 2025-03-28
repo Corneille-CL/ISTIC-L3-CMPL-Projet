@@ -79,7 +79,7 @@ type  : 'ent' {PtGen.pt(101);}
 decprocs: (decproc ptvg)+
   ;
   
-decproc :  'proc' {PtGen.pt(501);}  ident  parfixe? parmod? consts? vars? corps 
+decproc :  'proc' {PtGen.pt(501);}  ident {PtGen.pt(502);} parfixe? parmod? consts? vars? corps 
   ;
   
 ptvg  : ';'
@@ -112,7 +112,7 @@ instruction
   | lecture
   | ecriture
   | affouappel
-  |
+  | 
   ;
   
 inssi : 'si' expression {PtGen.pt(219);} {PtGen.pt(401);}'alors' instructions ('sinon' {PtGen.pt(402);} instructions)? 'fsi' {PtGen.pt(403);}
