@@ -77,6 +77,7 @@ dans tabSymb :
 1XX : déclarations / affections
 2XX : calcul d'expressions
 3XX : instructions entrée et sortie
+5xx:  procédures
 
 001 : ent pos
 002 : ent neg
@@ -126,6 +127,15 @@ dans tabSymb :
 410:
 411:
 412:
+
+
+501: tCour = neutre
+502: on ajoute la proc à tabSymb de type tCour
+503: on ajoute un paramfixe à tabSymb de type tCour
+504: on ajoute un parammod à tabSymb de type tCour
+
+
+
 
 
 
