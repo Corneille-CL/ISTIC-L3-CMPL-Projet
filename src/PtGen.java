@@ -404,14 +404,11 @@ public class PtGen {
 			verifBool();
 			break;
 		case 220:
-			if(false){
-				if(tabSymb[indIdentAff].type == ENT){
-					verifEnt();
-				} else {
-					verifBool();
-				}
+			if(tabSymb[indIdentAff].type == ENT){
+				verifEnt();
+			} else {
+				verifBool();
 			}
-			
 			break;
 
 		case 301:
