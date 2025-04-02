@@ -131,11 +131,16 @@ public class PtGen {
     // it = indice de remplissage de tabSymb
     // bc = bloc courant (=1 si le bloc courant est le programme principal)
 	private static int it, bc;
+
 	//VARIABLES PAR NOUS
 	private static int valAct; // valeur actuelle de l'item pour les declarations et expressions
 	private static int indVarGlob;
 	private static int indIdentAff;
 	private static int nbConst;
+	private static int nbParam;
+	private static int numIdentProc;
+	private static boolean dansProc;
+	private static int nbVarLoc;
 	//TODO : initialiser les belles variables
 	/** 
 	 * utilitaire de recherche de l'ident courant (ayant pour code UtilLex.numIdCourant) dans tabSymb
@@ -218,6 +223,10 @@ public class PtGen {
 		indVarGlob = 0;
 		nbConst = 0;
 		indIdentAff = 0;
+		nbParam = 0;
+		numIdentProc = 0;
+		dansProc = false;
+		nbVarLoc = 0;
 
 		//TODO si necessaire
 
@@ -264,33 +273,56 @@ public class PtGen {
 				nbConst ++;
 			}
 			break;
-		case 104 :
-			if(presentIdent(1) != 0){
-				UtilLex.messErr("ident déjà déclaré");
-			}else{
-				placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, indVarGlob);
-				indVarGlob += 1;
+		case 104 ://TODO verif si on est dans proc et changer varloc
+			if(!dansProc){
+				if(presentIdent(1) != 0){
+					UtilLex.messErr("ident déjà déclaré");
+				}else{
+					placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, indVarGlob);
+					indVarGlob += 1;
+				}
+			} else {
+				//une var locale peut cacher une var globale donc ok si elle est deja la pe pas enfaite
+				placeIdent(UtilLex.numIdCourant, VARLOCALE, tCour, nbParam + 2 + nbVarLoc);// on compte les ra et bp
+				afftabSymb();
+				nbVarLoc += 1;
 			}
+			
 			break;
 		case 105 :
 			po.produire(RESERVER);
 			po.produire(indVarGlob);
 			break;
 		case 106 :
-			if(presentIdent(1) == 0){
+			indIdentAff = presentIdent(1);
+			if(indIdentAff == 0){
 				UtilLex.messErr("ident non déclaré");
 			}
-			indIdentAff = presentIdent(1);
 			if(tabSymb[indIdentAff].categorie == CONSTANTE){
 				UtilLex.messErr("une constante ne peut être modifiée");
 			}
+			if(tabSymb[indIdentAff].categorie == PARAMFIXE){
+				UtilLex.messErr("un paramètre fixe ne peut être modifiée");
+			}
+			
 			break;
 		case 107 :
-			if(tabSymb[indIdentAff].type != tCour){
-				//UtilLex.messErr("les types ne correspondent pas");
+			if(!dansProc){
+				if(tabSymb[indIdentAff].type != tCour){
+					//UtilLex.messErr("les types ne correspondent pas");
+				}
+				po.produire(AFFECTERG);
+				po.produire(tabSymb[indIdentAff].info);
+			} else {
+				po.produire(AFFECTERL);
+				po.produire(tabSymb[indIdentAff].info);
+				if(tabSymb[indIdentAff].categorie == PARAMMOD || tabSymb[indIdentAff].categorie == VARLOCALE){
+					po.produire(0);
+				} else {
+					po.produire(1);
+				}
 			}
-			po.produire(AFFECTERG);
-			po.produire(indIdentAff);
+			
 			break;
 		
 		case 201:
@@ -298,13 +330,25 @@ public class PtGen {
 			po.produire(valAct);
 			break;
 		case 202:
-			if(tabSymb[presentIdent(1)].categorie == CONSTANTE){
+			EltTabSymb eltTabSymb = tabSymb[presentIdent(1)];
+			if(eltTabSymb.categorie == CONSTANTE){
 				po.produire(EMPILER);
 				po.produire(tabSymb[presentIdent(1)].info);
-			} else {
+			} 
+			if(eltTabSymb.categorie == VARGLOBALE) {
 				po.produire(CONTENUG);
 				po.produire(tabSymb[presentIdent(1)].info);
 			}
+			if(eltTabSymb.categorie == VARLOCALE) {
+				po.produire(CONTENUL);
+				po.produire(tabSymb[presentIdent(1)].info);
+				if(eltTabSymb.categorie == PARAMMOD || eltTabSymb.categorie == VARLOCALE){
+					po.produire(0);
+				} else {
+					po.produire(1);
+				}
+			}
+			
 			tCour = tabSymb[presentIdent(1)].type;
 			break;
 		case 203:
@@ -366,22 +410,37 @@ public class PtGen {
 				verifBool();
 			}
 			break;
+
 		case 301:
-			if(presentIdent(1) == 0){
+			int indiceIdent = presentIdent(1);
+			if(indiceIdent == 0){
 				UtilLex.messErr("variable non déclarée");
 			}
-			if(presentIdent(1) <= nbConst){
+			if(tabSymb[indiceIdent].categorie == CONSTANTE){
 				UtilLex.messErr("une constante ne peut être modifiée");
 			}
-
-			if(tabSymb[presentIdent(1)].type == BOOL){
+			if(tabSymb[indiceIdent].categorie == PARAMFIXE){
+				UtilLex.messErr(("un paramètre fixe ne peut être modifié"));
+			}
+			if(tabSymb[indiceIdent].type == BOOL){
 				po.produire(LIREBOOL);
 			} else {
 				po.produire(LIRENT);
 			}
 			
-			po.produire(AFFECTERG); //TODO pb avec les procs
-			po.produire(presentIdent(1)-nbConst-1);
+			if(!dansProc){
+				po.produire(AFFECTERG); //TODO pb avec les procs
+				po.produire(tabSymb[indiceIdent].info);
+			} else {
+				po.produire(AFFECTERL);
+				po.produire(tabSymb[indiceIdent].info);
+				if(tabSymb[indiceIdent].categorie == PARAMMOD || tabSymb[indiceIdent].categorie == VARLOCALE){
+					po.produire(0);
+				} else {
+					po.produire(1);
+				}
+			}
+			
 			break;
 		case 302:
 			if(presentIdent(1) == 0){
@@ -409,6 +468,7 @@ public class PtGen {
 			pileRep.empiler(po.getIpo());
 			break;
 		case 404:
+			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			int nextIpo = pileRep.depiler();
 			while (nextIpo != -1){
 				int tmpIpo = po.getElt(nextIpo);
@@ -425,10 +485,66 @@ public class PtGen {
 			po.modifier(pileRep.depiler(), po.getIpo()+2);
 			po.produire(pileRep.depiler());
 			break;
+
+		case 501:
+			po.produire(BINCOND);
+			po.produire(-1);
+			pileRep.empiler(po.getIpo());// on empile le adressage du bincond
+			dansProc = true;
+			nbParam = 0;
+			nbVarLoc = 0;
+			placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, po.getIpo());
+			placeIdent(-1, PRIVEE, NEUTRE, -1);//on connait pas le nb de param
+			pileRep.empiler(presentIdent(1)+1);//on empile en reprise ou est ce qu'on doit changer tabsymb
+			bc = it+1;
+			break;
+		case 502:
+			tabSymb[pileRep.depiler()].info = nbParam;
+			break;
+		case 503:
+			
+			bc = 1;
+			it = it-nbVarLoc;
+			for (int i = it-nbParam; i <= it; i++) {
+				tabSymb[i].code = -1; //on cache les noms des params
+			}
+			
+			po.produire(RETOUR);
+			po.produire(nbParam);
+			break;
+		case 504:
+			placeIdent(UtilLex.numIdCourant, PARAMFIXE, tCour, nbParam);
+			nbParam += 1;
+			break;
+		case 505:
+			placeIdent(UtilLex.numIdCourant, PARAMMOD, tCour, nbParam);
+			nbParam += 1;
+			break;
+		case 506:
+			po.modifier(pileRep.depiler(), po.getIpo()+1); //une fois les procs déclaré on redirige le bincond
+			dansProc = false;
+			break;
+		case 507:
+			if(tabSymb[indIdentAff].categorie == PROC){
+				po.produire(APPEL);
+				po.produire(tabSymb[indIdentAff].info);
+				po.produire(tabSymb[indIdentAff+1].info);
+			}
+			break;
+		case 508:
+			//empiler la valeur 
+			break;
+		case 509:
+			//empiler l'adr
+			if(tCour != tabSymb[presentIdent(1)].type){
+				UtilLex.messErr("type du paramètre incorrect");
+			}
+			break;
 		case 999 : 
 			afftabSymb(); // affichage de la table des symboles en fin de compilation
 			po.produire(ARRET);
 			po.constGen();
+			po.constObj();
 			break;
 
 		
