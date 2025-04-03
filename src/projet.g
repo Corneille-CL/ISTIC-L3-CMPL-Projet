@@ -118,13 +118,13 @@ instruction
 inssi : 'si' expression {PtGen.pt(219);} {PtGen.pt(401);}'alors' instructions ('sinon' {PtGen.pt(402);} instructions)? 'fsi' {PtGen.pt(403);}
   ;
   
-inscond : 'cond' {PtGen.pt(401);} expression {PtGen.pt(219);} ':' {PtGen.pt(402);} instructions 
-          (',' {PtGen.pt(403);} expression {PtGen.pt(219);} ':' {PtGen.pt(402);} instructions)* 
-          ( 'aut' {PtGen.pt(403);} instructions  |  ) 
-          'fcond' {PtGen.pt(404);}
+inscond : 'cond' {PtGen.pt(411);} expression {PtGen.pt(219);} ':' {PtGen.pt(412);} instructions 
+          (',' {PtGen.pt(413);} expression {PtGen.pt(219);} ':' {PtGen.pt(412);} instructions)* 
+          ( 'aut' {PtGen.pt(413);} instructions  |  ) 
+          'fcond' {PtGen.pt(414);}
   ;
   
-boucle  : 'ttq' {PtGen.pt(408);} expression {PtGen.pt(219);}{PtGen.pt(401);} 'faire' instructions {PtGen.pt(410);} 'fait'
+boucle  : 'ttq' {PtGen.pt(421);} expression {PtGen.pt(219);}{PtGen.pt(422);} 'faire' instructions {PtGen.pt(423);} 'fait'
   ;
   
 lecture: 'lire' '(' ident {PtGen.pt(301);} ( ',' ident {PtGen.pt(301);} )* ')' 
@@ -135,7 +135,7 @@ ecriture: 'ecrire' '(' expression {PtGen.pt(302);} ( ',' expression {PtGen.pt(30
   
 affouappel
   : ident  ( {PtGen.pt(106);} ':=' expression {PtGen.pt(107);} {PtGen.pt(220);}
-            |   (effixes (effmods)?)?  {PtGen.pt(507);}
+            | {PtGen.pt(510);} (effixes (effmods)? {PtGen.pt(511);})?  {PtGen.pt(507);}
            )
   ;
   

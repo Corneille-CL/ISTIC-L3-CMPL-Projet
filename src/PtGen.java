@@ -136,11 +136,13 @@ public class PtGen {
 	private static int valAct; // valeur actuelle de l'item pour les declarations et expressions
 	private static int indVarGlob;
 	private static int indIdentAff;
-	private static int nbConst;
-	private static int nbParam;
-	private static int numIdentProc;
+	private static int nbConstLoc;
+	private static int nbParamDecl;
 	private static boolean dansProc;
 	private static int nbVarLoc;
+	private static int nbParamFixe;
+	private static int nbParamMod;
+	private static int indProc;
 	//TODO : initialiser les belles variables
 	/** 
 	 * utilitaire de recherche de l'ident courant (ayant pour code UtilLex.numIdCourant) dans tabSymb
@@ -221,12 +223,13 @@ public class PtGen {
 		tCour = NEUTRE;
 
 		indVarGlob = 0;
-		nbConst = 0;
+		nbConstLoc = 0;
 		indIdentAff = 0;
-		nbParam = 0;
-		numIdentProc = 0;
+		nbParamDecl = 0;
 		dansProc = false;
 		nbVarLoc = 0;
+		nbParamFixe = 0;
+		nbParamMod = 0;
 
 		//TODO si necessaire
 
@@ -270,21 +273,24 @@ public class PtGen {
 				UtilLex.messErr("ident déjà déclaré");
 			}else{
 				placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, valAct);
-				nbConst ++;
+			}
+			if(bc != 1){
+				nbConstLoc ++;//on compte les constante locales
 			}
 			break;
-		case 104 ://TODO verif si on est dans proc et changer varloc
-			if(!dansProc){
+		case 104 :
+			if(bc == 1){//dans main
 				if(presentIdent(1) != 0){
 					UtilLex.messErr("ident déjà déclaré");
-				}else{
-					placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, indVarGlob);
-					indVarGlob += 1;
 				}
-			} else {
-				//une var locale peut cacher une var globale donc ok si elle est deja la pe pas enfaite
-				placeIdent(UtilLex.numIdCourant, VARLOCALE, tCour, nbParam + 2 + nbVarLoc);// on compte les ra et bp
-				afftabSymb();
+				placeIdent(UtilLex.numIdCourant, VARGLOBALE, tCour, indVarGlob);
+				indVarGlob += 1;
+			} else {//dans proc
+				if(presentIdent(bc) != 0){
+					UtilLex.messErr("ident déjà déclaré");
+				}
+				placeIdent(UtilLex.numIdCourant, VARLOCALE, tCour, nbParamDecl + 2 + nbVarLoc);// on compte les ra et bp
+				afftabSymb(); //DEBUG TABSYMB
 				nbVarLoc += 1;
 			}
 			
@@ -307,13 +313,31 @@ public class PtGen {
 			
 			break;
 		case 107 :
-			if(!dansProc){
+			if(tabSymb[indIdentAff].type != tCour){
+				UtilLex.messErr("les types ne correspondent pas");
+			}
+			if(tabSymb[indIdentAff].categorie == VARGLOBALE){
+				po.produire(AFFECTERG);
+				po.produire(tabSymb[indIdentAff].info);
+			} else if(tabSymb[indIdentAff].categorie == VARLOCALE){
+				po.produire(AFFECTERL);
+				po.produire(tabSymb[indIdentAff].info);
+				po.produire(0);
+			} else if(tabSymb[indIdentAff].categorie == PARAMMOD){
+				po.produire(AFFECTERL);
+				po.produire(tabSymb[indIdentAff].info);
+				po.produire(1);
+			}
+
+
+			if(bc == 1){//dans main
 				if(tabSymb[indIdentAff].type != tCour){
-					//UtilLex.messErr("les types ne correspondent pas");
+					UtilLex.messErr("les types ne correspondent pas");
 				}
 				po.produire(AFFECTERG);
 				po.produire(tabSymb[indIdentAff].info);
-			} else {
+			} else {//dans proc
+
 				po.produire(AFFECTERL);
 				po.produire(tabSymb[indIdentAff].info);
 				if(tabSymb[indIdentAff].categorie == PARAMMOD || tabSymb[indIdentAff].categorie == VARLOCALE){
@@ -322,7 +346,6 @@ public class PtGen {
 					po.produire(1);
 				}
 			}
-			
 			break;
 		
 		case 201:
@@ -428,10 +451,10 @@ public class PtGen {
 				po.produire(LIRENT);
 			}
 			
-			if(!dansProc){
+			if(bc == 1){//dans main
 				po.produire(AFFECTERG); //TODO pb avec les procs
 				po.produire(tabSymb[indiceIdent].info);
-			} else {
+			} else {//dans proc
 				po.produire(AFFECTERL);
 				po.produire(tabSymb[indiceIdent].info);
 				if(tabSymb[indiceIdent].categorie == PARAMMOD || tabSymb[indiceIdent].categorie == VARLOCALE){
@@ -440,7 +463,6 @@ public class PtGen {
 					po.produire(1);
 				}
 			}
-			
 			break;
 		case 302:
 			if(presentIdent(1) == 0){
@@ -452,22 +474,36 @@ public class PtGen {
 				po.produire(ECRBOOL);
 			}
 			break;
-
-		case 401:
-			pileRep.empiler(-1);
-			break;
-		case 402:
+		case 401 ://bsifaux du si
 			po.produire(BSIFAUX);
 			po.produire(-1);
 			pileRep.empiler(po.getIpo());
 			break;
-		case 403:
+		case 402 ://bincond du sinon
+			po.produire(BINCOND);
+			po.produire(-1);
+			po.modifier(pileRep.depiler(), po.getIpo()+1);
+			pileRep.empiler(po.getIpo());
+			break;
+		case 403 ://reprise en fsi
+			po.modifier(pileRep.depiler(), po.getIpo()+1);
+			break;
+		
+		case 411://prep du cond -1 en pileRep
+			pileRep.empiler(-1);
+			break;
+		case 412://empiler bsifaux + pileRep
+			po.produire(BSIFAUX);
+			po.produire(-1);
+			pileRep.empiler(po.getIpo());
+			break;
+		case 413://rep du bsifaux + @du bincond vers le dernier + emp @ dans pileRep
 			po.produire(BINCOND);
 			po.modifier(pileRep.depiler(), po.getIpo()+2);
 			po.produire(pileRep.depiler());
 			pileRep.empiler(po.getIpo());
 			break;
-		case 404:
+		case 414://rep des bincond
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			int nextIpo = pileRep.depiler();
 			while (nextIpo != -1){
@@ -476,22 +512,29 @@ public class PtGen {
 				nextIpo = tmpIpo;
 			}
 			break;
-		case 408:
+		
+		case 421:
 			pileRep.empiler(po.getIpo()+1);
 			break;
-		
-		case 410:
+		case 422:
+			po.produire(BSIFAUX);
+			po.produire(-1);
+			pileRep.empiler(po.getIpo());
+			break;
+		case 423:
 			po.produire(BINCOND);
 			po.modifier(pileRep.depiler(), po.getIpo()+2);
 			po.produire(pileRep.depiler());
 			break;
+		
+		
 
 		case 501:
 			po.produire(BINCOND);
 			po.produire(-1);
 			pileRep.empiler(po.getIpo());// on empile le adressage du bincond
 			dansProc = true;
-			nbParam = 0;
+			nbParamDecl = 0;
 			nbVarLoc = 0;
 			placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, po.getIpo());
 			placeIdent(-1, PRIVEE, NEUTRE, -1);//on connait pas le nb de param
@@ -499,45 +542,75 @@ public class PtGen {
 			bc = it+1;
 			break;
 		case 502:
-			tabSymb[pileRep.depiler()].info = nbParam;
+			tabSymb[pileRep.depiler()].info = nbParamDecl;
 			break;
 		case 503:
-			
 			bc = 1;
-			it = it-nbVarLoc;
-			for (int i = it-nbParam; i <= it; i++) {
+			it = it-nbVarLoc-nbConstLoc;
+			for (int i = it-nbParamDecl; i <= it; i++) {
 				tabSymb[i].code = -1; //on cache les noms des params
 			}
-			
 			po.produire(RETOUR);
-			po.produire(nbParam);
+			po.produire(nbParamDecl);
 			break;
 		case 504:
-			placeIdent(UtilLex.numIdCourant, PARAMFIXE, tCour, nbParam);
-			nbParam += 1;
+			placeIdent(UtilLex.numIdCourant, PARAMFIXE, tCour, nbParamDecl);
+			nbParamDecl += 1;
 			break;
 		case 505:
-			placeIdent(UtilLex.numIdCourant, PARAMMOD, tCour, nbParam);
-			nbParam += 1;
+			placeIdent(UtilLex.numIdCourant, PARAMMOD, tCour, nbParamDecl);
+			nbParamDecl += 1;
 			break;
 		case 506:
 			po.modifier(pileRep.depiler(), po.getIpo()+1); //une fois les procs déclaré on redirige le bincond
 			dansProc = false;
 			break;
 		case 507:
-			if(tabSymb[indIdentAff].categorie == PROC){
-				po.produire(APPEL);
-				po.produire(tabSymb[indIdentAff].info);
-				po.produire(tabSymb[indIdentAff+1].info);
-			}
+			po.produire(APPEL);
+			po.produire(tabSymb[indProc].info);
+			po.produire(tabSymb[indProc+1].info);
 			break;
 		case 508:
-			//empiler la valeur 
+			nbParamFixe ++;
+			if(nbParamFixe>tabSymb[indProc+1].info){
+				UtilLex.messErr("nombre de paramètres incorrect");
+			}
+			if(tabSymb[indProc+1+nbParamFixe].categorie == PARAMMOD){
+				UtilLex.messErr("nombre de parametre fixes trop élevé");
+			}
+			if(tCour != tabSymb[indProc+1+nbParamFixe].type){
+				//DEBUG IndPROC a 0 lors de pb
+				UtilLex.messErr("paramètre fixe numero "+nbParamFixe+" de mauvais type");
+			}
 			break;
 		case 509:
-			//empiler l'adr
-			if(tCour != tabSymb[presentIdent(1)].type){
-				UtilLex.messErr("type du paramètre incorrect");
+			nbParamMod ++;
+			if(nbParamFixe+nbParamMod>tabSymb[indProc+1].info){
+				UtilLex.messErr("nombre de paramètres incorrect");
+			}
+			if(tabSymb[indProc+1+nbParamFixe+nbParamMod].categorie == PARAMFIXE){
+				UtilLex.messErr("nombre de paramètres modifiables trop élevé");
+			}
+			if(tabSymb[presentIdent(1)].type != tabSymb[indProc+1+nbParamFixe+nbParamMod].type){
+				UtilLex.messErr("paramètre modifiable numero "+nbParamMod+" de mauvais type");
+			}
+			if(tabSymb[presentIdent(1)].categorie == VARGLOBALE){
+				po.produire(EMPILERADG);
+				po.produire(tabSymb[presentIdent(1)].info);
+			}else if(tabSymb[presentIdent(1)].categorie == VARLOCALE){
+				po.produire(EMPILERADL);
+				po.produire(tabSymb[presentIdent(1)].info);
+			}
+			
+			break;
+		case 510:
+			nbParamFixe = 0;
+			nbParamMod = 0;
+			indProc = presentIdent(1);
+			break;
+		case 511:
+			if(nbParamFixe+nbParamMod<tabSymb[indProc+1].info){
+				UtilLex.messErr("nombre de paramètres trop petit");
 			}
 			break;
 		case 999 : 

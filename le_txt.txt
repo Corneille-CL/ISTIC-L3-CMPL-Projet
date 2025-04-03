@@ -56,6 +56,7 @@ Ce qui a été fais :
 401 : produire bsifaux et ligne de reprise ?
 402 : on connait ligne de reprise à changer plus haut avec un bincond a fsi
 403 : on connait la fin du si on ecris la ou y a un trou
+404 : 
 
 501 : empile ident de proc
 502 : mettre nb param
@@ -74,7 +75,3 @@ System.out.print("\n\n debug\n " + var + "\n debug \n\n");
 {PtGen.pt(001);} 
 TestsProjet/DeclExp-
 TestsProjet/polyP18-exemple1ChapIII
-
-	
-
-	
