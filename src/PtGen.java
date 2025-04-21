@@ -133,12 +133,10 @@ public class PtGen {
 	private static int it, bc;
 
 	//VARIABLES PAR NOUS
-	private static int valAct; // valeur actuelle de l'item pour les declarations et expressions
 	private static int indVarGlob;
 	private static int indIdentAff;
 	private static int nbConstLoc;
 	private static int nbParamDecl;
-	private static boolean dansProc;
 	private static int nbVarLoc;
 	private static int nbParamFixe;
 	private static int nbParamMod;
@@ -226,7 +224,6 @@ public class PtGen {
 		nbConstLoc = 0;
 		indIdentAff = 0;
 		nbParamDecl = 0;
-		dansProc = false;
 		nbVarLoc = 0;
 		nbParamFixe = 0;
 		nbParamMod = 0;
@@ -246,19 +243,19 @@ public class PtGen {
 			initialisations();
 			break;
 		case 001:
-			valAct = UtilLex.valEnt;
+			vCour = UtilLex.valEnt;
 			tCour = ENT;
 			break;
 		case 002:
-			valAct = -UtilLex.valEnt;
+			vCour = -UtilLex.valEnt;
 			tCour = ENT;
 			break;
 		case 003:
-			valAct = 1;
+			vCour = VRAI;
 			tCour = BOOL;
 			break;
 		case 004:
-			valAct = 0;
+			vCour = FAUX;
 			tCour = BOOL;
 			break;
 		
@@ -272,7 +269,7 @@ public class PtGen {
 			if(presentIdent(1) != 0){
 				UtilLex.messErr("ident déjà déclaré");
 			}else{
-				placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, valAct);
+				placeIdent(UtilLex.numIdCourant, CONSTANTE, tCour, vCour);
 			}
 			if(bc != 1){
 				nbConstLoc ++;//on compte les constante locales
@@ -350,7 +347,7 @@ public class PtGen {
 		
 		case 201:
 			po.produire(EMPILER);
-			po.produire(valAct);
+			po.produire(vCour);
 			break;
 		case 202:
 			EltTabSymb eltTabSymb = tabSymb[presentIdent(1)];
@@ -533,7 +530,6 @@ public class PtGen {
 			po.produire(BINCOND);
 			po.produire(-1);
 			pileRep.empiler(po.getIpo());// on empile le adressage du bincond
-			dansProc = true;
 			nbParamDecl = 0;
 			nbVarLoc = 0;
 			placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, po.getIpo());
@@ -563,7 +559,6 @@ public class PtGen {
 			break;
 		case 506:
 			po.modifier(pileRep.depiler(), po.getIpo()+1); //une fois les procs déclaré on redirige le bincond
-			dansProc = false;
 			break;
 		case 507:
 			po.produire(APPEL);
