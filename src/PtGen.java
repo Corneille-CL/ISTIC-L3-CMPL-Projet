@@ -134,13 +134,14 @@ public class PtGen {
 
 	//VARIABLES PAR NOUS
 	private static int indVarGlob;
-	private static int indIdentAff;
-	private static int nbConstLoc;
-	private static int nbParamDecl;
-	private static int nbVarLoc;
-	private static int nbParamFixe;
-	private static int nbParamMod;
-	private static int indProc;
+	private static int indIdentAff; //indice dans tabSymb de l'ident qui recoit la valeur
+	private static int nbConstLoc; //nombre de constantes locales dans proc
+	private static int nbParamDecl; //nombre de paramètres de la proc lors de la déclaraton
+	private static int nbVarLoc; //nombre de variables locales dans proc
+	private static int nbParamFixe; //nombre de param fixe lors de l'appel
+	private static int nbParamMod; //nobre de param fixe lors de l'appel
+	private static int indProc; //indice dans tabSymb de proc appelé
+	private static int indNbVar; //indice dans tabSymb de nombre de param du proc quand decl
 	//TODO : initialiser les belles variables
 	/** 
 	 * utilitaire de recherche de l'ident courant (ayant pour code UtilLex.numIdCourant) dans tabSymb
@@ -227,6 +228,7 @@ public class PtGen {
 		nbVarLoc = 0;
 		nbParamFixe = 0;
 		nbParamMod = 0;
+		indNbVar = 0;
 
 		//TODO si necessaire
 
@@ -287,14 +289,17 @@ public class PtGen {
 					UtilLex.messErr("ident déjà déclaré");
 				}
 				placeIdent(UtilLex.numIdCourant, VARLOCALE, tCour, nbParamDecl + 2 + nbVarLoc);// on compte les ra et bp
-				afftabSymb(); //DEBUG TABSYMB
 				nbVarLoc += 1;
 			}
 			
 			break;
 		case 105 :
 			po.produire(RESERVER);
-			po.produire(indVarGlob);
+			if (bc == 1) {
+				po.produire(indVarGlob);
+			} else {
+				po.produire(nbVarLoc);
+			}
 			break;
 		case 106 :
 			indIdentAff = presentIdent(1);
@@ -310,23 +315,6 @@ public class PtGen {
 			
 			break;
 		case 107 :
-			if(tabSymb[indIdentAff].type != tCour){
-				UtilLex.messErr("les types ne correspondent pas");
-			}
-			if(tabSymb[indIdentAff].categorie == VARGLOBALE){
-				po.produire(AFFECTERG);
-				po.produire(tabSymb[indIdentAff].info);
-			} else if(tabSymb[indIdentAff].categorie == VARLOCALE){
-				po.produire(AFFECTERL);
-				po.produire(tabSymb[indIdentAff].info);
-				po.produire(0);
-			} else if(tabSymb[indIdentAff].categorie == PARAMMOD){
-				po.produire(AFFECTERL);
-				po.produire(tabSymb[indIdentAff].info);
-				po.produire(1);
-			}
-
-
 			if(bc == 1){//dans main
 				if(tabSymb[indIdentAff].type != tCour){
 					UtilLex.messErr("les types ne correspondent pas");
@@ -334,13 +322,17 @@ public class PtGen {
 				po.produire(AFFECTERG);
 				po.produire(tabSymb[indIdentAff].info);
 			} else {//dans proc
-
-				po.produire(AFFECTERL);
-				po.produire(tabSymb[indIdentAff].info);
-				if(tabSymb[indIdentAff].categorie == PARAMMOD || tabSymb[indIdentAff].categorie == VARLOCALE){
-					po.produire(0);
+				if(tabSymb[indIdentAff].categorie == VARGLOBALE){
+					po.produire(AFFECTERG);
+					po.produire(tabSymb[indIdentAff].info);
 				} else {
-					po.produire(1);
+					po.produire(AFFECTERL);
+					po.produire(tabSymb[indIdentAff].info);
+					if(tabSymb[indIdentAff].categorie == PARAMMOD){
+						po.produire(1);
+					} else {
+						po.produire(0);
+					}
 				}
 			}
 			break;
@@ -359,17 +351,16 @@ public class PtGen {
 				po.produire(CONTENUG);
 				po.produire(tabSymb[presentIdent(1)].info);
 			}
-			if(eltTabSymb.categorie == VARLOCALE) {
+			if(eltTabSymb.categorie == VARLOCALE  || eltTabSymb.categorie == PARAMMOD || eltTabSymb.categorie == PARAMFIXE) {
 				po.produire(CONTENUL);
 				po.produire(tabSymb[presentIdent(1)].info);
-				if(eltTabSymb.categorie == PARAMMOD || eltTabSymb.categorie == VARLOCALE){
+				if(eltTabSymb.categorie == VARLOCALE || eltTabSymb.categorie == PARAMFIXE){
 					po.produire(0);
 				} else {
 					po.produire(1);
 				}
 			}
-			
-			tCour = tabSymb[presentIdent(1)].type;
+			tCour = eltTabSymb.type;
 			break;
 		case 203:
 			po.produire(OU);
@@ -475,30 +466,36 @@ public class PtGen {
 			po.produire(BSIFAUX);
 			po.produire(-1);
 			pileRep.empiler(po.getIpo());
+			System.out.println("DEBUG : 401");
 			break;
 		case 402 ://bincond du sinon
 			po.produire(BINCOND);
 			po.produire(-1);
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			pileRep.empiler(po.getIpo());
+			System.out.println("DEBUG : 402");
 			break;
 		case 403 ://reprise en fsi
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
+			System.out.println("DEBUG : 403");
 			break;
 		
 		case 411://prep du cond -1 en pileRep
 			pileRep.empiler(-1);
+			System.out.println("DEBUG : 411");
 			break;
 		case 412://empiler bsifaux + pileRep
 			po.produire(BSIFAUX);
 			po.produire(-1);
 			pileRep.empiler(po.getIpo());
+			System.out.println("DEBUG : 412");
 			break;
 		case 413://rep du bsifaux + @du bincond vers le dernier + emp @ dans pileRep
 			po.produire(BINCOND);
 			po.modifier(pileRep.depiler(), po.getIpo()+2);
 			po.produire(pileRep.depiler());
 			pileRep.empiler(po.getIpo());
+			System.out.println("DEBUG : 413");
 			break;
 		case 414://rep des bincond
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
@@ -508,41 +505,51 @@ public class PtGen {
 				po.modifier(nextIpo, po.getIpo()+1);
 				nextIpo = tmpIpo;
 			}
+			System.out.println("DEBUG : 414");
+			
 			break;
 		
-		case 421:
-			pileRep.empiler(po.getIpo()+1);
+		case 421://ttq
+			pileRep.empiler(po.getIpo()+1);//empile adr avant de faire la condition
+			System.out.println("DEBUG : 421");
 			break;
-		case 422:
+		case 422://bsifaux du ttq pour la cond
 			po.produire(BSIFAUX);
 			po.produire(-1);
-			pileRep.empiler(po.getIpo());
+			pileRep.empiler(po.getIpo());//empile adr bsifaux et y mettre fin de proc
+			System.out.println("DEBUG : 422");
 			break;
-		case 423:
+		case 423://bincond du ttq vers le début
 			po.produire(BINCOND);
 			po.modifier(pileRep.depiler(), po.getIpo()+2);
 			po.produire(pileRep.depiler());
+			System.out.println("DEBUG : 423");
 			break;
 		
-		
-
-		case 501:
+		case 500:
 			po.produire(BINCOND);
 			po.produire(-1);
+			System.out.println("DEBUG : 500");
 			pileRep.empiler(po.getIpo());// on empile le adressage du bincond
+			
+			break;
+		case 501:
 			nbParamDecl = 0;
 			nbVarLoc = 0;
-			placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, po.getIpo());
+			nbConstLoc = 0;
+			placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, po.getIpo()+1);
 			placeIdent(-1, PRIVEE, NEUTRE, -1);//on connait pas le nb de param
-			pileRep.empiler(presentIdent(1)+1);//on empile en reprise ou est ce qu'on doit changer tabsymb
+			indNbVar = presentIdent(1)+1;//ou est ce qu'on doit changer tabsymb pour le nb de param
 			bc = it+1;
 			break;
 		case 502:
-			tabSymb[pileRep.depiler()].info = nbParamDecl;
+			tabSymb[indNbVar].info = nbParamDecl;//changer nb de param
 			break;
 		case 503:
 			bc = 1;
+			afftabSymb();
 			it = it-nbVarLoc-nbConstLoc;
+			System.out.println("\n nbVL, nbCL : "+nbVarLoc+", "+nbConstLoc +"\n");
 			for (int i = it-nbParamDecl; i <= it; i++) {
 				tabSymb[i].code = -1; //on cache les noms des params
 			}
@@ -559,6 +566,8 @@ public class PtGen {
 			break;
 		case 506:
 			po.modifier(pileRep.depiler(), po.getIpo()+1); //une fois les procs déclaré on redirige le bincond
+		
+			System.out.println("DEBUG : 506");
 			break;
 		case 507:
 			po.produire(APPEL);
@@ -592,9 +601,14 @@ public class PtGen {
 			if(tabSymb[presentIdent(1)].categorie == VARGLOBALE){
 				po.produire(EMPILERADG);
 				po.produire(tabSymb[presentIdent(1)].info);
-			}else if(tabSymb[presentIdent(1)].categorie == VARLOCALE){
+			}else if(tabSymb[presentIdent(1)].categorie == VARLOCALE || tabSymb[presentIdent(1)].categorie == PARAMMOD){
 				po.produire(EMPILERADL);
 				po.produire(tabSymb[presentIdent(1)].info);
+				if(tabSymb[presentIdent(1)].categorie == VARLOCALE){
+					po.produire(0);
+				}else{
+					po.produire(1);
+				}
 			}
 			
 			break;
@@ -602,6 +616,7 @@ public class PtGen {
 			nbParamFixe = 0;
 			nbParamMod = 0;
 			indProc = presentIdent(1);
+			System.out.println(indProc);
 			break;
 		case 511:
 			if(nbParamFixe+nbParamMod<tabSymb[indProc+1].info){
