@@ -1,4 +1,8 @@
 TestsProjet/*.gen
+TestsProjet/*.obj
+TestsProjet/*.desc
+TestsProjet/*.ima
+TestsProjet/*.map
 
 src/projetLexer.java
 src/projetParser.java
