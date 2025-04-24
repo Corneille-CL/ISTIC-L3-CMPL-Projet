@@ -36,8 +36,8 @@ import java.io.FileInputStream;
 catch (RecognitionException e) {reportError (e) ; throw e ; }}
 
 
-unite  :   unitprog {PtGen.pt(999);} EOF
-      |    unitmodule  EOF
+unite  :  {PtGen.pt(601);} unitprog {PtGen.pt(999);} EOF
+      |   {PtGen.pt(602);} unitmodule {PtGen.pt(999);} EOF
   ;
   
 unitprog
@@ -56,14 +56,14 @@ declarations
   ;
   
 partiedef
-  : 'def' ident  (',' ident )* ptvg
+  : 'def' ident {PtGen.pt(606);} (',' ident {PtGen.pt(606);} )* ptvg
   ;
   
 partieref: 'ref'  specif (',' specif)* ptvg
   ;
   
-specif  : ident  ( 'fixe' '(' type  ( ',' type  )* ')' )? 
-                 ( 'mod'  '(' type  ( ',' type  )* ')' )? 
+specif  : ident {PtGen.pt(603);} ( 'fixe' '(' type {PtGen.pt(604);} ( ',' type {PtGen.pt(604);} )* ')' )? 
+                 ( 'mod'  '(' type {PtGen.pt(604);} ( ',' type {PtGen.pt(604);} )* ')' )? {PtGen.pt(605);}
   ;
   
 consts  : 'const' ( ident '=' valeur {PtGen.pt(103);} ptvg  ) +

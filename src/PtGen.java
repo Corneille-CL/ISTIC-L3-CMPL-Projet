@@ -142,6 +142,8 @@ public class PtGen {
 	private static int nbParamMod; //nobre de param fixe lors de l'appel
 	private static int indProc; //indice dans tabSymb de proc appelé
 	private static int indNbVar; //indice dans tabSymb de nombre de param du proc quand decl
+	private static int nbRef;
+	private static int nbDef;
 	//TODO : initialiser les belles variables
 	/** 
 	 * utilitaire de recherche de l'ident courant (ayant pour code UtilLex.numIdCourant) dans tabSymb
@@ -229,6 +231,8 @@ public class PtGen {
 		nbParamFixe = 0;
 		nbParamMod = 0;
 		indNbVar = 0;
+		nbDef = 0;
+		nbRef = 0;
 
 		//TODO si necessaire
 
@@ -294,12 +298,23 @@ public class PtGen {
 			
 			break;
 		case 105 :
-			po.produire(RESERVER);
-			if (bc == 1) {
-				po.produire(indVarGlob);
+			if (desc.getUnite().equals("programme")) {
+				po.produire(RESERVER);
+				if (bc == 1) {
+					po.produire(indVarGlob); //on reserve tout le temps
+					desc.setTailleGlobaux(indVarGlob);
+				} else {
+					po.produire(nbVarLoc);
+				}
 			} else {
-				po.produire(nbVarLoc);
+				if(bc != 1){//on reserve les var loc dans les proc des modules
+					po.produire(RESERVER);
+					po.produire(nbVarLoc);
+				} else {
+					desc.setTailleGlobaux(indVarGlob);
+				}
 			}
+			
 			break;
 		case 106 :
 			indIdentAff = presentIdent(1);
@@ -321,13 +336,26 @@ public class PtGen {
 				}
 				po.produire(AFFECTERG);
 				po.produire(tabSymb[indIdentAff].info);
+				if(desc.getUnite().equals("module")){
+					po.vecteurTrans(TRANSDON);
+					desc.incrNbTansExt();
+				}
+				
 			} else {//dans proc
 				if(tabSymb[indIdentAff].categorie == VARGLOBALE){
 					po.produire(AFFECTERG);
 					po.produire(tabSymb[indIdentAff].info);
+					if(desc.getUnite().equals("module")){
+						po.vecteurTrans(TRANSDON);
+						desc.incrNbTansExt();
+					}
 				} else {
 					po.produire(AFFECTERL);
 					po.produire(tabSymb[indIdentAff].info);
+					if(desc.getUnite().equals("module")){
+						po.vecteurTrans(TRANSDON);
+						desc.incrNbTansExt();
+					}
 					if(tabSymb[indIdentAff].categorie == PARAMMOD){
 						po.produire(1);
 					} else {
@@ -346,10 +374,15 @@ public class PtGen {
 			if(eltTabSymb.categorie == CONSTANTE){
 				po.produire(EMPILER);
 				po.produire(tabSymb[presentIdent(1)].info);
+
 			} 
 			if(eltTabSymb.categorie == VARGLOBALE) {
 				po.produire(CONTENUG);
 				po.produire(tabSymb[presentIdent(1)].info);
+				if(desc.getUnite().equals("module")){
+					po.vecteurTrans(TRANSDON);
+					desc.incrNbTansExt();
+				}
 			}
 			if(eltTabSymb.categorie == VARLOCALE  || eltTabSymb.categorie == PARAMMOD || eltTabSymb.categorie == PARAMFIXE) {
 				po.produire(CONTENUL);
@@ -440,8 +473,12 @@ public class PtGen {
 			}
 			
 			if(bc == 1){//dans main
-				po.produire(AFFECTERG); //TODO pb avec les procs
+				po.produire(AFFECTERG);
 				po.produire(tabSymb[indiceIdent].info);
+				if(desc.getUnite().equals("module")){
+					po.vecteurTrans(TRANSDON);
+					desc.incrNbTansExt();
+				}
 			} else {//dans proc
 				po.produire(AFFECTERL);
 				po.produire(tabSymb[indiceIdent].info);
@@ -465,12 +502,20 @@ public class PtGen {
 		case 401 ://bsifaux du si
 			po.produire(BSIFAUX);
 			po.produire(-1);
+			if(desc.getUnite().equals("module")){
+				po.vecteurTrans(TRANSCODE);
+				desc.incrNbTansExt();
+			}
 			pileRep.empiler(po.getIpo());
 			System.out.println("DEBUG : 401");
 			break;
 		case 402 ://bincond du sinon
 			po.produire(BINCOND);
 			po.produire(-1);
+			if(desc.getUnite().equals("module")){
+				po.vecteurTrans(TRANSCODE);
+				desc.incrNbTansExt();
+			}
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			pileRep.empiler(po.getIpo());
 			System.out.println("DEBUG : 402");
@@ -487,6 +532,10 @@ public class PtGen {
 		case 412://empiler bsifaux + pileRep
 			po.produire(BSIFAUX);
 			po.produire(-1);
+			if(desc.getUnite().equals("module")){
+				po.vecteurTrans(TRANSCODE);
+				desc.incrNbTansExt();
+			}
 			pileRep.empiler(po.getIpo());
 			System.out.println("DEBUG : 412");
 			break;
@@ -494,6 +543,10 @@ public class PtGen {
 			po.produire(BINCOND);
 			po.modifier(pileRep.depiler(), po.getIpo()+2);
 			po.produire(pileRep.depiler());
+			if(desc.getUnite().equals("module")){
+				po.vecteurTrans(TRANSCODE);
+				desc.incrNbTansExt();
+			}
 			pileRep.empiler(po.getIpo());
 			System.out.println("DEBUG : 413");
 			break;
@@ -516,6 +569,10 @@ public class PtGen {
 		case 422://bsifaux du ttq pour la cond
 			po.produire(BSIFAUX);
 			po.produire(-1);
+			if(desc.getUnite().equals("module")){
+				po.vecteurTrans(TRANSCODE);
+				desc.incrNbTansExt();
+			}
 			pileRep.empiler(po.getIpo());//empile adr bsifaux et y mettre fin de proc
 			System.out.println("DEBUG : 422");
 			break;
@@ -523,26 +580,49 @@ public class PtGen {
 			po.produire(BINCOND);
 			po.modifier(pileRep.depiler(), po.getIpo()+2);
 			po.produire(pileRep.depiler());
+			if(desc.getUnite().equals("module")){
+				po.vecteurTrans(TRANSCODE);
+				desc.incrNbTansExt();
+			}
 			System.out.println("DEBUG : 423");
 			break;
 		
 		case 500:
-			po.produire(BINCOND);
-			po.produire(-1);
-			System.out.println("DEBUG : 500");
-			pileRep.empiler(po.getIpo());// on empile le adressage du bincond
+			if(desc.getUnite().equals("programme")){
+				po.produire(BINCOND);
+				po.produire(-1);
+				if(desc.getUnite().equals("module")){
+					po.vecteurTrans(TRANSCODE);
+					desc.incrNbTansExt();
+				}
+				System.out.println("DEBUG : 500");
+				pileRep.empiler(po.getIpo());// on empile le adressage du bincond
+			}
+			
 			
 			break;
 		case 501:
+			nbDef += 1;
+			if(desc.getUnite().equals("module")){
+				desc.modifDefAdPo(nbDef, po.getIpo()+1);
+			}
 			nbParamDecl = 0;
 			nbVarLoc = 0;
 			nbConstLoc = 0;
 			placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, po.getIpo()+1);
-			placeIdent(-1, PRIVEE, NEUTRE, -1);//on connait pas le nb de param
+			int indDef = desc.presentDef(UtilLex.chaineIdent(UtilLex.numIdCourant));
+			if(indDef != 0){
+				placeIdent(-1, DEF, NEUTRE, -1);
+			} else {
+				placeIdent(-1, PRIVEE, NEUTRE, -1);//on connait pas le nb de param
+			}
 			indNbVar = presentIdent(1)+1;//ou est ce qu'on doit changer tabsymb pour le nb de param
 			bc = it+1;
 			break;
 		case 502:
+			if(desc.getUnite().equals("module")){
+				desc.modifDefNbParam(nbDef,nbParamDecl);
+			}
 			tabSymb[indNbVar].info = nbParamDecl;//changer nb de param
 			break;
 		case 503:
@@ -565,13 +645,17 @@ public class PtGen {
 			nbParamDecl += 1;
 			break;
 		case 506:
-			po.modifier(pileRep.depiler(), po.getIpo()+1); //une fois les procs déclaré on redirige le bincond
-		
-			System.out.println("DEBUG : 506");
+			if(desc.getUnite().equals("programme")){
+				po.modifier(pileRep.depiler(), po.getIpo()+1); //une fois les procs déclaré on redirige le bincond
+			
+				System.out.println("DEBUG : 506");
+			}
 			break;
 		case 507:
 			po.produire(APPEL);
 			po.produire(tabSymb[indProc].info);
+			po.vecteurTrans(REFEXT);
+			desc.incrNbTansExt();
 			po.produire(tabSymb[indProc+1].info);
 			break;
 		case 508:
@@ -579,12 +663,17 @@ public class PtGen {
 			if(nbParamFixe>tabSymb[indProc+1].info){
 				UtilLex.messErr("nombre de paramètres incorrect");
 			}
-			if(tabSymb[indProc+1+nbParamFixe].categorie == PARAMMOD){
-				UtilLex.messErr("nombre de parametre fixes trop élevé");
-			}
-			if(tCour != tabSymb[indProc+1+nbParamFixe].type){
-				//DEBUG IndPROC a 0 lors de pb
-				UtilLex.messErr("paramètre fixe numero "+nbParamFixe+" de mauvais type");
+			if(tabSymb[indProc+1].categorie != REF){
+				if(tabSymb[indProc+1+nbParamFixe].categorie == PARAMMOD){
+					UtilLex.messErr("nombre de parametre fixes trop élevé");
+				}
+				if(tCour != tabSymb[indProc+1+nbParamFixe].type){
+					//DEBUG IndPROC a 0 lors de pb
+					System.out.println("DEBUG indProc : "+indProc);
+					System.out.println("DEBUG nbParFixe : "+nbParamFixe+" et type : "+ tabSymb[indProc+1+nbParamFixe].type);
+					afftabSymb();
+					UtilLex.messErr("paramètre fixe numero "+nbParamFixe+" de mauvais type");
+				}
 			}
 			break;
 		case 509:
@@ -600,6 +689,12 @@ public class PtGen {
 			}
 			if(tabSymb[presentIdent(1)].categorie == VARGLOBALE){
 				po.produire(EMPILERADG);
+				if(desc.getUnite().equals("module")){
+					if(desc.getUnite().equals("module")){
+						po.vecteurTrans(TRANSDON);
+						desc.incrNbTansExt();
+					}
+				}
 				po.produire(tabSymb[presentIdent(1)].info);
 			}else if(tabSymb[presentIdent(1)].categorie == VARLOCALE || tabSymb[presentIdent(1)].categorie == PARAMMOD){
 				po.produire(EMPILERADL);
@@ -616,18 +711,46 @@ public class PtGen {
 			nbParamFixe = 0;
 			nbParamMod = 0;
 			indProc = presentIdent(1);
-			System.out.println(indProc);
+			System.out.println("DEBUG indPROC 510 : " +indProc);
 			break;
 		case 511:
 			if(nbParamFixe+nbParamMod<tabSymb[indProc+1].info){
 				UtilLex.messErr("nombre de paramètres trop petit");
 			}
 			break;
+
+		case 601:
+			desc.setUnite("programme");
+		break;
+		case 602:
+			desc.setUnite("module");
+		break;
+		case 603:
+			nbRef += 1;
+			nbParamDecl = 0;
+			placeIdent(UtilLex.numIdCourant, PROC, NEUTRE, nbRef);
+			desc.ajoutRef(UtilLex.chaineIdent(UtilLex.numIdCourant));
+		break;
+		case 604:
+			nbParamDecl += 1;
+		break;
+		case 605:
+			desc.modifRefNbParam(nbRef, nbParamDecl);
+			placeIdent(-1, REF, NEUTRE, nbParamDecl);
+		break;
+		case 606:
+			desc.ajoutDef(UtilLex.chaineIdent(UtilLex.numIdCourant));
+		break;
+		
 		case 999 : 
 			afftabSymb(); // affichage de la table des symboles en fin de compilation
-			po.produire(ARRET);
+			if(desc.getUnite().equals("programme")){
+				po.produire(ARRET);
+			}
+			desc.setTailleCode(po.getIpo());
 			po.constGen();
 			po.constObj();
+			desc.ecrireDesc(UtilLex.nomSource);
 			break;
 
 		
