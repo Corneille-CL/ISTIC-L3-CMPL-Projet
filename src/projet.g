@@ -120,8 +120,8 @@ inssi : 'si' expression {PtGen.pt(219);} {PtGen.pt(401);}'alors' instructions ('
   
 inscond : 'cond' {PtGen.pt(411);} expression {PtGen.pt(219);} ':' {PtGen.pt(412);} instructions 
           (',' {PtGen.pt(413);} expression {PtGen.pt(219);} ':' {PtGen.pt(412);} instructions)* 
-          ( 'aut' {PtGen.pt(413);} instructions  |  ) 
-          'fcond' {PtGen.pt(414);}
+          ( 'aut' {PtGen.pt(413);} instructions  {PtGen.pt(415);} |  {PtGen.pt(414);} ) 
+          'fcond' 
   ;
   
 boucle  : 'ttq' {PtGen.pt(421);} expression {PtGen.pt(219);}{PtGen.pt(422);} 'faire' instructions {PtGen.pt(423);} 'fait'

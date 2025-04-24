@@ -31,8 +31,6 @@ Trinôme : Leffondre ElAroussi Hanine
 
 ---- CE QUI POSE PROBLÈME ----
 
-le_txt.txt
-
 Ce qui a été fais :
 	les instructions conditionnelles sont opérationnelles
 	pour les procs :

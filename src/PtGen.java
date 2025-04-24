@@ -526,10 +526,12 @@ public class PtGen {
 			break;
 		
 		case 411://prep du cond -1 en pileRep
-			pileRep.empiler(-1);
 			System.out.println("DEBUG : 411");
+			pileRep.empiler(-1);
+			
 			break;
 		case 412://empiler bsifaux + pileRep
+			System.out.println("DEBUG : 412");
 			po.produire(BSIFAUX);
 			po.produire(-1);
 			if(desc.getUnite().equals("module")){
@@ -537,9 +539,10 @@ public class PtGen {
 				desc.incrNbTansExt();
 			}
 			pileRep.empiler(po.getIpo());
-			System.out.println("DEBUG : 412");
+			
 			break;
 		case 413://rep du bsifaux + @du bincond vers le dernier + emp @ dans pileRep
+			System.out.println("DEBUG : 413");
 			po.produire(BINCOND);
 			po.modifier(pileRep.depiler(), po.getIpo()+2);
 			po.produire(pileRep.depiler());
@@ -548,9 +551,10 @@ public class PtGen {
 				desc.incrNbTansExt();
 			}
 			pileRep.empiler(po.getIpo());
-			System.out.println("DEBUG : 413");
+			
 			break;
-		case 414://rep des bincond
+		case 414:
+			System.out.println("DEBUG : 414");
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			int nextIpo = pileRep.depiler();
 			while (nextIpo != -1){
@@ -558,8 +562,16 @@ public class PtGen {
 				po.modifier(nextIpo, po.getIpo()+1);
 				nextIpo = tmpIpo;
 			}
-			System.out.println("DEBUG : 414");
 			
+		break;
+		case 415://rep des bincond
+			System.out.println("DEBUG : 415");
+			int nextIpo2 = pileRep.depiler();
+			while (nextIpo2 != -1){
+				int tmpIpo = po.getElt(nextIpo2);
+				po.modifier(nextIpo2, po.getIpo()+1);
+				nextIpo2 = tmpIpo;
+			}
 			break;
 		
 		case 421://ttq
