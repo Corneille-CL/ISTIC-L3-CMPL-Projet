@@ -2,102 +2,104 @@ Trinôme : Leffondre ElAroussi Hanine
 
 ---- CE QUI FONCTIONNE ----
 - Compilation de programmes  
-- Instructions :
-- Affectation
+- Instructions
+- Affectation / Declaration
 - Lecture / écriture
-- Appel ok 
-- les instructions conditionnelles sont opérationnelles // voir cond 
+- Appel
+- Les instructions conditionnelles sont opérationnelles
 - Boucles 'ttq ... faire ... fait' fonctionnelles
 - Procédures (déclaration, appel, paramètres 'fixe'/ 'mod') 
 - Table des symboles complète 
 - La majorité des points de génération ('PtGen.pt(XXX)') est bien couverte
 - Production correcte des instructions Mapile dans 'po'
-- La majorité des erreurs sont couvertes
+- La majorité des erreurs sont couvertes pour la compilation basique
+- Compilation séparée (pas de gestion d'erreur)
+- Edition de liens (pas de gestion d'erreur)
 
 
 ---- CE QUI FONCTIONNE PAS ----
-- Problème sur COND 
+- Gestion des erreurs lors de la compliation séparée + edition de lien
 -
--
-
-
 
 ---- CE QUI A POSÉ PROBLÈME ----
 - Gestion des « cond »
 - L'emplacement des points de génération 
- 
 
+0XX : Controle de valeur et d'ident
+1XX : Déclarations / Affections
+2XX : Calcul d'expressions
+3XX : Entrée et sortie
+4XX : Conditions
+5XX : Procédures
+6XX : Compilation séparée
 
-
----- CE QUI POSE PROBLÈME ----
-
-Ce qui a été fais :
-	les instructions conditionnelles sont opérationnelles
-	pour les procs :
-		- table des symboles : ok
-		- appel : ok
-		- calcul des expr : en cours mais avancé
-		- verification de type : en cours
-
-0XX : valeur
-1XX : déclarations / affections
-2XX : calcul d'expressions
-3XX : instructions entrée et sortie
-4XX : les conditions
-5XX : les procs
-
-001 : ent pos
-002 : ent neg
-003 : bool vrai
-004 : bool faux
+001 : Entier positif
+002 : Entier négatif
+003 : Booleen vrai
+004 : Booleen faux
 
 101 : tCour = ent
 102 : tCour = bool
-103 : ajouter une const a tabSymb de type tCour et de valeur valEnt avec un if en fonction du type
-104 : ajouter une var à tabSymb de type tCour et de valeur valEnt avec un if en fonction du type
+103 : ajouter une const a tabSymb
+104 : ajouter une var à tabSymb
 105 : reserver les variables
-106 : sauv l'ident qui doit etre modifié (son adresse sans doute)
-107 : affecter le sommet de pile à la variable correspondante
+106 : mise en mémoire de l'ident qui doit etre modifié
+107 : affectation
 
-201 : empile la valeur en dure
-202 : empile la valeur de l'ident (varglo ou const)
-203 : pile OU
-204 : pile ET
-205 : pile NON
-206 : pile Eg
-207 : pile DIFF
-208 : pile SUP
-209 : pile SUPEG
-210 : pile INF
-211 : pile INFEG
-212 : pile ADD
-213 : pile SOUS
-214 : pile MUL
-215 : pile DIV
+201 : empile une valeur
+202 : empile la valeur de l'ident
+203 : OU
+204 : ET
+205 : NON
+206 : Eg
+207 : DIFF
+208 : SUP
+209 : SUPEG
+210 : INF
+211 : INFEG
+212 : ADD
+213 : SOUS
+214 : MUL
+215 : DIV
 216 : tCour = ent
 217 : tCour = bool
 218 : verification du type ent
 219 : verification du type bool
 220 : verif tCour = type de l'ident affecté
 
-301 : produire lirent ou lirebool en fonction du type
-302 : produire ecrent ou ecrbool en fonction du type
+301 : produire lirent ou lirebool et affecter
+302 : produire ecrent ou ecrbool
 
-401 : produire bsifaux et ligne de reprise ?
-402 : on connait ligne de reprise à changer plus haut avec un bincond a fsi
-403 : on connait la fin du si on ecris la ou y a un trou
-404 : 
+401 : SI ALORS SINON produire bsifaux 
+402 : SI ALORS SINON produire bincond + reprise 
+403 : SI ALORS SINON reprise
+411 : COND preparation reprise
+412 : COND bsifaux
+413 : COND bincond
+414 : COND reprise sans aut
+415 : COND reprise avec aut
+421 : TTQ preparation 
+422 : TTQ bsifaux
+423 : TTQ bincond
 
-501 : empile ident de proc
+500 : bincond en prog
+501 : init et placeident du proc
 502 : mettre nb param
 503 : retour de procédure
 504 : ajoute un paramfixe dans la table de symboles
 505 : ajoute un parammod dans la table des symboles
-506 : redirige bincond
+506 : redirige bincond de 500
 507 : appel
-508 : signaler qu'on rentre param fixe + test type
-509 : signaler qu'on rentre param mod + test type
+508 : verif param fixe
+509 : verif param mod
+510 : verif appel
+511 : verif nb param
 
-1000: exit
+601 : init programme
+602 : init module
+603 : gestion des REF
+604 : gestion des params
+605 : modif nb param de REF
+606 : ajoute DEF
 
-System.out.print("\n\n debug\n " + var + "\n debug \n\n");
+999: exit

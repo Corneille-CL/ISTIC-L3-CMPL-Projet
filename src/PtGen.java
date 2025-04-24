@@ -502,6 +502,7 @@ public class PtGen {
 				po.produire(ECRBOOL);
 			}
 			break;
+		
 		case 401 ://bsifaux du si
 			po.produire(BSIFAUX);
 			po.produire(-1);
@@ -601,8 +602,6 @@ public class PtGen {
 				}
 				pileRep.empiler(po.getIpo());// on empile le adressage du bincond
 			}
-			
-			
 			break;
 		case 501:
 			nbDef += 1;
@@ -657,10 +656,7 @@ public class PtGen {
 			po.vecteurTrans(REFEXT);
 			desc.incrNbTansExt();
 			po.produire(tabSymb[indProc+1].info);
-			/* Si on fait appel à une procédure jamais déclarée 
-			if(tabSymb[indProc].info != tabSymb[presentIdent(1)].info ){
-				UtilLex.messErr("Vous faites appel à une procédure non définie");
-			}*/ 
+			
 			break;
 		case 508:
 			nbParamFixe ++;
@@ -675,7 +671,6 @@ public class PtGen {
 					UtilLex.messErr("paramètre fixe numero "+nbParamFixe+" de mauvais type");
 				}
 			}
-			
 			break;
 
 		case 509:
