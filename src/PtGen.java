@@ -573,6 +573,10 @@ public class PtGen {
 			po.produire(APPEL);
 			po.produire(tabSymb[indProc].info);
 			po.produire(tabSymb[indProc+1].info);
+			/* Si on fait appel à une procédure jamais déclarée 
+			if(tabSymb[indProc].info != tabSymb[presentIdent(1)].info ){
+				UtilLex.messErr("Vous faites appel à une procédure non définie");
+			}*/ 
 			break;
 		case 508:
 			nbParamFixe ++;
@@ -586,7 +590,12 @@ public class PtGen {
 				//DEBUG IndPROC a 0 lors de pb
 				UtilLex.messErr("paramètre fixe numero "+nbParamFixe+" de mauvais type");
 			}
+			if(tabSymb[indIdentAff].categorie == PARAMFIXE){
+				UtilLex.messErr("un paramètre fixe ne peut être modifiée");
+			}
+
 			break;
+
 		case 509:
 			nbParamMod ++;
 			if(nbParamFixe+nbParamMod>tabSymb[indProc+1].info){
@@ -597,6 +606,9 @@ public class PtGen {
 			}
 			if(tabSymb[presentIdent(1)].type != tabSymb[indProc+1+nbParamFixe+nbParamMod].type){
 				UtilLex.messErr("paramètre modifiable numero "+nbParamMod+" de mauvais type");
+			}
+			if(tabSymb[presentIdent(1)].categorie == CONSTANTE ){
+				UtilLex.messErr("un paramètre modifiable ne peut pas être une constante");
 			}
 			if(tabSymb[presentIdent(1)].categorie == VARGLOBALE){
 				po.produire(EMPILERADG);
@@ -610,12 +622,15 @@ public class PtGen {
 					po.produire(1);
 				}
 			}
-			
 			break;
+
 		case 510:
 			nbParamFixe = 0;
 			nbParamMod = 0;
 			indProc = presentIdent(1);
+			if(indProc == 0){
+				UtilLex.messErr("Procédure non déclarée  ");
+			}
 			System.out.println(indProc);
 			break;
 		case 511:
