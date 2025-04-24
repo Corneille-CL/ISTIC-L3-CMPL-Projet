@@ -159,8 +159,8 @@ public class Edl {
 			erreur(FATALE, "creation du fichier " + nomProg
 					+ ".map impossible");
 		for (int i = 1; i < ipo; i++) {
-			Ecriture.ecrireInt(po[ipo]);
-			Ecriture.ecrireString("\n");
+			Ecriture.ecrireInt(f2,po[i]);
+			Ecriture.ecrireString(f2,"\n");
 		}
 		Ecriture.fermer(f2);
 

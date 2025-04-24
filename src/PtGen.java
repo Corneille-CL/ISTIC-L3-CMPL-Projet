@@ -679,9 +679,6 @@ public class PtGen {
 					UtilLex.messErr("paramètre fixe numero "+nbParamFixe+" de mauvais type");
 				}
 			}
-			if(tabSymb[indIdentAff].categorie == PARAMFIXE){
-				UtilLex.messErr("un paramètre fixe ne peut être modifiée");
-			}
 			
 			break;
 
