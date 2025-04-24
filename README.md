@@ -1,20 +1,105 @@
-## Getting Started
+Trinôme : Leffondre ElAroussi Hanine
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+---- CE QUI FONCTIONNE ----
+- Compilation de programmes  
+- Instructions :
+- Affectation
+- Lecture / écriture
+- Appel ok 
+- les instructions conditionnelles sont opérationnelles // voir cond 
+- Boucles 'ttq ... faire ... fait' fonctionnelles
+- Procédures (déclaration, appel, paramètres 'fixe'/ 'mod') 
+- Table des symboles complète 
+- La majorité des points de génération ('PtGen.pt(XXX)') est bien couverte
+- Production correcte des instructions Mapile dans 'po'
+- La majorité des erreurs sont couvertes
 
-## Folder Structure
 
-The workspace contains two folders by default, where:
+---- CE QUI FONCTIONNE PAS ----
+- Problème sur COND 
+-
+-
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
+---- CE QUI A POSÉ PROBLÈME ----
+- Gestion des « cond »
+- L'emplacement des points de génération 
+ 
 
-## Dependency Management
 
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
 
-ok
+---- CE QUI POSE PROBLÈME ----
+
+le_txt.txt
+
+Ce qui a été fais :
+	les instructions conditionnelles sont opérationnelles
+	pour les procs :
+		- table des symboles : ok
+		- appel : ok
+		- calcul des expr : en cours mais avancé
+		- verification de type : en cours
+
+0XX : valeur
+1XX : déclarations / affections
+2XX : calcul d'expressions
+3XX : instructions entrée et sortie
+4XX : les conditions
+5XX : les procs
+
+001 : ent pos
+002 : ent neg
+003 : bool vrai
+004 : bool faux
+
+101 : tCour = ent
+102 : tCour = bool
+103 : ajouter une const a tabSymb de type tCour et de valeur valEnt avec un if en fonction du type
+104 : ajouter une var à tabSymb de type tCour et de valeur valEnt avec un if en fonction du type
+105 : reserver les variables
+106 : sauv l'ident qui doit etre modifié (son adresse sans doute)
+107 : affecter le sommet de pile à la variable correspondante
+
+201 : empile la valeur en dure
+202 : empile la valeur de l'ident (varglo ou const)
+203 : pile OU
+204 : pile ET
+205 : pile NON
+206 : pile Eg
+207 : pile DIFF
+208 : pile SUP
+209 : pile SUPEG
+210 : pile INF
+211 : pile INFEG
+212 : pile ADD
+213 : pile SOUS
+214 : pile MUL
+215 : pile DIV
+216 : tCour = ent
+217 : tCour = bool
+218 : verification du type ent
+219 : verification du type bool
+220 : verif tCour = type de l'ident affecté
+
+301 : produire lirent ou lirebool en fonction du type
+302 : produire ecrent ou ecrbool en fonction du type
+
+401 : produire bsifaux et ligne de reprise ?
+402 : on connait ligne de reprise à changer plus haut avec un bincond a fsi
+403 : on connait la fin du si on ecris la ou y a un trou
+404 : 
+
+501 : empile ident de proc
+502 : mettre nb param
+503 : retour de procédure
+504 : ajoute un paramfixe dans la table de symboles
+505 : ajoute un parammod dans la table des symboles
+506 : redirige bincond
+507 : appel
+508 : signaler qu'on rentre param fixe + test type
+509 : signaler qu'on rentre param mod + test type
+
+1000: exit
+
+System.out.print("\n\n debug\n " + var + "\n debug \n\n");
