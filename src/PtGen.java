@@ -370,6 +370,9 @@ public class PtGen {
 			po.produire(vCour);
 			break;
 		case 202:
+			if(presentIdent(1) == 0){
+				UtilLex.messErr("ident non déclaré");
+			}
 			EltTabSymb eltTabSymb = tabSymb[presentIdent(1)];
 			if(eltTabSymb.categorie == CONSTANTE){
 				po.produire(EMPILER);
@@ -507,7 +510,6 @@ public class PtGen {
 				desc.incrNbTansExt();
 			}
 			pileRep.empiler(po.getIpo());
-			System.out.println("DEBUG : 401");
 			break;
 		case 402 ://bincond du sinon
 			po.produire(BINCOND);
@@ -518,20 +520,16 @@ public class PtGen {
 			}
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			pileRep.empiler(po.getIpo());
-			System.out.println("DEBUG : 402");
 			break;
 		case 403 ://reprise en fsi
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
-			System.out.println("DEBUG : 403");
 			break;
 		
 		case 411://prep du cond -1 en pileRep
-			System.out.println("DEBUG : 411");
 			pileRep.empiler(-1);
 			
 			break;
 		case 412://empiler bsifaux + pileRep
-			System.out.println("DEBUG : 412");
 			po.produire(BSIFAUX);
 			po.produire(-1);
 			if(desc.getUnite().equals("module")){
@@ -542,7 +540,6 @@ public class PtGen {
 			
 			break;
 		case 413://rep du bsifaux + @du bincond vers le dernier + emp @ dans pileRep
-			System.out.println("DEBUG : 413");
 			po.produire(BINCOND);
 			po.modifier(pileRep.depiler(), po.getIpo()+2);
 			po.produire(pileRep.depiler());
@@ -554,7 +551,6 @@ public class PtGen {
 			
 			break;
 		case 414:
-			System.out.println("DEBUG : 414");
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			int nextIpo = pileRep.depiler();
 			while (nextIpo != -1){
@@ -565,7 +561,6 @@ public class PtGen {
 			
 		break;
 		case 415://rep des bincond
-			System.out.println("DEBUG : 415");
 			int nextIpo2 = pileRep.depiler();
 			while (nextIpo2 != -1){
 				int tmpIpo = po.getElt(nextIpo2);
@@ -576,7 +571,6 @@ public class PtGen {
 		
 		case 421://ttq
 			pileRep.empiler(po.getIpo()+1);//empile adr avant de faire la condition
-			System.out.println("DEBUG : 421");
 			break;
 		case 422://bsifaux du ttq pour la cond
 			po.produire(BSIFAUX);
@@ -586,7 +580,6 @@ public class PtGen {
 				desc.incrNbTansExt();
 			}
 			pileRep.empiler(po.getIpo());//empile adr bsifaux et y mettre fin de proc
-			System.out.println("DEBUG : 422");
 			break;
 		case 423://bincond du ttq vers le début
 			po.produire(BINCOND);
@@ -596,7 +589,6 @@ public class PtGen {
 				po.vecteurTrans(TRANSCODE);
 				desc.incrNbTansExt();
 			}
-			System.out.println("DEBUG : 423");
 			break;
 		
 		case 500:
@@ -607,7 +599,6 @@ public class PtGen {
 					po.vecteurTrans(TRANSCODE);
 					desc.incrNbTansExt();
 				}
-				System.out.println("DEBUG : 500");
 				pileRep.empiler(po.getIpo());// on empile le adressage du bincond
 			}
 			
@@ -641,7 +632,6 @@ public class PtGen {
 			bc = 1;
 			afftabSymb();
 			it = it-nbVarLoc-nbConstLoc;
-			System.out.println("\n nbVL, nbCL : "+nbVarLoc+", "+nbConstLoc +"\n");
 			for (int i = it-nbParamDecl; i <= it; i++) {
 				tabSymb[i].code = -1; //on cache les noms des params
 			}
@@ -659,8 +649,6 @@ public class PtGen {
 		case 506:
 			if(desc.getUnite().equals("programme")){
 				po.modifier(pileRep.depiler(), po.getIpo()+1); //une fois les procs déclaré on redirige le bincond
-			
-				System.out.println("DEBUG : 506");
 			}
 			break;
 		case 507:
@@ -684,10 +672,6 @@ public class PtGen {
 					UtilLex.messErr("nombre de parametre fixes trop élevé");
 				}
 				if(tCour != tabSymb[indProc+1+nbParamFixe].type){
-					//DEBUG IndPROC a 0 lors de pb
-					System.out.println("DEBUG indProc : "+indProc);
-					System.out.println("DEBUG nbParFixe : "+nbParamFixe+" et type : "+ tabSymb[indProc+1+nbParamFixe].type);
-					afftabSymb();
 					UtilLex.messErr("paramètre fixe numero "+nbParamFixe+" de mauvais type");
 				}
 			}
@@ -702,7 +686,7 @@ public class PtGen {
 			if(tabSymb[indProc+1+nbParamFixe+nbParamMod].categorie == PARAMFIXE){
 				UtilLex.messErr("nombre de paramètres modifiables trop élevé");
 			}
-			if(tabSymb[presentIdent(1)].type != tabSymb[indProc+1+nbParamFixe+nbParamMod].type){
+			if(tabSymb[indProc+1].categorie != REF && tabSymb[presentIdent(1)].type != tabSymb[indProc+1+nbParamFixe+nbParamMod].type){
 				UtilLex.messErr("paramètre modifiable numero "+nbParamMod+" de mauvais type");
 			}
 			if(tabSymb[presentIdent(1)].categorie == CONSTANTE ){
@@ -735,7 +719,6 @@ public class PtGen {
 			if(indProc == 0){
 				UtilLex.messErr("Procédure non déclarée  ");
 			}
-			System.out.println(indProc);
 			break;
 		case 511:
 			if(nbParamFixe+nbParamMod<tabSymb[indProc+1].info){
